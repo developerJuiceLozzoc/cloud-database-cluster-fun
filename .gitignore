@@ -1,2 +1,4 @@
 node_modules
 app/node_modules
+.DS_Store
+./meaty/.DS_Store
