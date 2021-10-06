@@ -1,4 +1,4 @@
-version: '3'
+version: '3.1'
 
 services:
  mysql:
@@ -16,8 +16,8 @@ services:
   environment:
     - POSTGRES_USER=root  # The PostgreSQL user (useful to connect to the database)
     - POSTGRES_PASSWORD=password  # The PostgreSQL password (useful to connect to the database)
-    - POSTGRES_DB=$MONGODB_DATABASE_NAME # The PostgreSQL default database (automatically created at first launch)
   volumes:
-   - db:/data/d
+   - mysql-data:/var/lib/postgresql/data
+
 volumes:
- db:
+ mysql-data:

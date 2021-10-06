@@ -9,15 +9,9 @@ fields = []
 rows = []
 
 def mapMovieRow(row):
-    return {
-     "epoch": row[0],
-     "episode": row[1],
-     "year": row[2],
-     "leecher": row[3],
-     "tags": row[4].split(" "),
-     "title": row[5],
-     "path": row[6].replace("../redesign-files","/home/pi/Videos",1)
-    }
+    pipath = row[6].replace("../redesign-files","/home/pi/Videos",1)
+    fstat = os.stat(pipath)
+    return [row[0],row[2],row[5],row[1],row[3],"{}".format(fstat.st_size),pipath]
 
 # reading csv file
 with open(filename, 'r') as csvfile:
@@ -26,10 +20,10 @@ with open(filename, 'r') as csvfile:
 
     # extracting each data row one by one
     for row in csvreader:
-        rows.append(mapMovieRow(row))
+        print(",".join(mapMovieRow(row)))
+#        rows.append(mapMovieRow(row))
 
     # get total number of rows
     print("Total no. of rows: %d"%(csvreader.line_num))
 
 
-print(rows[0])

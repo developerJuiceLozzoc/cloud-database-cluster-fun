@@ -149,6 +149,33 @@ async function connect() {
 //        console.log("tags created")
 //        await client.query(createTagsRelationshipsTable())
 //       await client.query(createBulkTags())
+        await client.query(createTagsTable())
+        await pgclient.query(`
+         INSERT INTO tags (tagName) VALUES('movie');
+         INSERT INTO tags (tagName) VALUES('cartoon');
+         INSERT INTO tags (tagName) values('anime');
+         INSERT INTO tags (tagName) values('scary');
+         INSERT INTO tags (tagName) values('drama');
+         INSERT INTO tags (tagName) values('for couples');
+         INSERT INTO tags (tagName) values('anime');
+         INSERT INTO tags (tagName) VALUES('funny');
+         INSERT INTO tags (tagName) VALUES('feels good');
+         INSERT INTO tags (tagName) values('food');
+         INSERT INTO tags (tagName) values('porn');
+         INSERT INTO tags (tagName) values('sports');
+         INSERT INTO tags (tagName) values('evil');
+         INSERT INTO tags (tagName) values('folklore');
+         INSERT INTO tags (tagName) VALUES('robots');
+         INSERT INTO tags (tagName) VALUES('social commentary');
+         INSERT INTO tags (tagName) values('space');
+         INSERT INTO tags (tagName) values('post-apocalyptic');
+         INSERT INTO tags (tagName) values('love story');
+         INSERT INTO tags (tagName) values('bad acting');
+         INSERT INTO tags (tagName) VALUES('geeky');
+         INSERT INTO tags (tagName) VALUES('live action');
+         INSERT INTO tags (tagName) VALUES('marvel');
+         INSERT INTO tags (tagName) VALUES('dc');
+        `);
         console.log("bulk tag inserted")
         let tags = await client.query(readAllTags())
         console.log(tags)
