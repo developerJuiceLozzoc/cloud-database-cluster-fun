@@ -4,12 +4,21 @@ CREATE TABLE movies (
 epoch varchar(50) NOT NULL,
 season int,
 episode int NOT NULL,
-title varchar NOT NULL,
+title varchar(75) NOT NULL,
 year int NOT NULL,
-publisher varchar(16),
-filename varchar NOT NULL,
+leecher varchar(30),
+filename varchar(200) NOT NULL,
 movieId SERIAL PRIMARY KEY,
-duration int NOT NULL);`
+movie_size bigint NOT NULL);`
+}
+
+function createWatchHistoryTable(){
+  return `DROP TABLE IF EXISTS WatchHistory;
+  CREATE TABLE WatchHistory(
+    nodeId varchar(16) NOT NULL,
+    movieId int NOT NULL,
+    timestamp bigint NOT NULL
+  );`
 }
 
 function createTagsTable() {
@@ -49,11 +58,11 @@ class Movie {
         this.epoch = epoch;
         this.title = title;
         this.filename = filename;
-        this.duration = duration;
-        this.episode = episode
-        this.season = season
-        this.publisher = publisher
-        this.year = year;
+        this.duration = parseInt(duration);
+        this.episode = parseInt(episode);
+        this.season = season ? parseInt(season) : null;
+        this.leecher = publisher
+        this.year = parseInt(year);
 
 
 
@@ -63,6 +72,7 @@ class Movie {
 }
 
 module.exports = {
+  createWatchHistoryTable,
     createMoviesTable,
     createTagsTable,
     createTagsRelationshipsTable,
