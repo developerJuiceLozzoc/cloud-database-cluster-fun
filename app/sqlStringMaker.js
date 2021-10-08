@@ -11,12 +11,12 @@ const {
 } = require('./model/schema')
 
 
-function useClientToBulkInsert(client){
+function useClientToBulkInsert(client,filepath){
 
-  fs.createReadStream('../meaty/tvshowdump/pi/movies.csv')
+  fs.createReadStream(filepath)
     .pipe(csv())
     .on('data', async (row) => {
-      const {tags, epoch,year,title,episode,leecher,size,path} = row;
+      const {tags, epoch,year,title,season, episode,leecher,size,path} = row;
 
       try {
         let movie = new Movie({
@@ -24,18 +24,25 @@ function useClientToBulkInsert(client){
           filename: path,
           publisher: leecher,
           duration: size,
-          season: null
+          season
         });
         let movieString = createInsertMovieString(movie);
+        if(movie.isInvalid || !movieString){
+          console.log(movie,movieString);
+        }
+        // if(movie.filename.length > 200 || movie.leecher.length > 30 || movie.epoch.length > 50 || movie.title.length > 256) {
+        //   console.log(movie);
+        // }
+        // console.log(movie);
         const {rows} = await client.query(movieString.text,movieString.values)
         if(rows.length > 0 ){
           let movieID= rows[0].movieid;
           createMovieTagLinksString(movieID,tags.split(" ")).forEach(async function(query){
             let result = await client.query(query.text,query.values)
-            console.log(result);
+            // console.log(result);
           })
-
         }
+
       } catch(e){
         console.log(e);
       }

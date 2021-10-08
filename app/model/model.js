@@ -37,8 +37,8 @@ function createInsertMovieString(movie){
         return undefined;
     }
 	return {
-		text:"INSERT INTO movies(epoch,year,title,season,episode,leecher,movie_size,filename) VALUES($1,$2,$3,$4,$5,$6,$7,$8)  RETURNING movieId,title;",
-		values: [movie.epoch,movie.year,movie.title,movie.season,movie.episode,movie.leecher,movie.duration,movie.filename],
+		text:"INSERT INTO movies(epoch,year,title,episode,leecher,movie_size,filename) VALUES($1,$2,$3,$4,$5,$6,$7)  RETURNING movieId,title;",
+		values: [movie.epoch,movie.year,movie.title,movie.episode,movie.leecher,movie.duration,movie.filename],
 	}
 }
 
@@ -53,14 +53,64 @@ function createMovieTagLinksString(movieId,tagIds){
 }
 
 function createWatchHistoryItem(stats){
-  const {}
+  const {subnet,movieid} = stats
+  return {
+    text: `INSERT INTO WatchHistory (nodeId,movieId,timestamp) values($1,$2,$3)`,
+    values: [subnet,movieid,Date.now()]
+  }
 }
 
-function selectMovieIdsWithTags(tags){
-    return `SELECT movieId FROM MoviesWithTag WHERE tagId IN (${tags})`
+
+/*
+select movie ideas that contain all these tags
+
+*/
+function selectMovieIdsWithTags(andtags,tags){
+    return `select movieId
+        from MoviesWithTag
+        where tagId in (${tags})
+        group by movieId
+        having array_agg(tagId) @> array[${andtags}]`;
 }
 
-function selectMoviesWithMovieIds(movieids){
+/* movies is an array of movie ids and their crap
+*/
+function filterMovieids(movies,filter){
+  let moviesDict = {}
+  let items = []
+  movies.forEach(function(movie){
+      if(!moviesDict[movie.movieid]){
+        moviesDict[movie.movieid] = {}
+      }
+      moviesDict[movie.movieid][`${movie.tagid}`] = true
+
+  })
+
+  Object.keys(moviesDict).forEach(function(key){
+    let andcount = 0
+    let orVerify = false
+    filter.andtags.forEach(function(tag){
+      if(moviesDict[key][`${tag}`]){
+        andcount += 1;
+      }
+    })
+    filter.ortags.forEach(function(tag){
+      if(moviesDict[key][`${tag}`]){
+        orVerify = true;
+      }
+    })
+
+    if(andcount == filter.andtags.length && orVerify){
+      items.push(key)
+    }
+
+  })
+  console.log(moviesDict);
+
+  return items
+}
+
+function selectMoviesByManyIds(movieids){
   return `SELECT * FROM movies WHERE movieId IN (${movieids})`;
 }
 
@@ -70,15 +120,32 @@ function selectTagIdsWithMovieId(movieId){
         values: [movieId],
     }
 }
-
 function readAllTags() {
     return `SELECT * FROM tags;`
 }
+/* deprecated
+
 function readAllMovies() {
     return `SELECT * FROM movies;`;
 }
 function readAllTaggedMovies() {
   return `SELECT * FROM MoviesWithTag;`
+}
+
+SELECT
+   COUNT(*)
+FROM
+   table_name
+*/
+
+function readTagCount() {
+    return `SELECT COUNT(*)  FROM tags;`
+}
+function readMovieCount() {
+    return `SELECT COUNT(*)  FROM movies;`;
+}
+function readTaggedMoviesCount() {
+  return `SELECT COUNT(*) FROM MoviesWithTag;`
 }
 
 
@@ -95,9 +162,12 @@ module.exports = {
     createMovieTagLinksString,
     createBulkTags,
     readAllTags,
-    readAllMovies,
-    readAllTaggedMovies,
+    readTagCount,
+    readMovieCount,
+    readTaggedMoviesCount,
     selectMovieIdsWithTags,
+    selectMoviesByManyIds,
     selectTagIdsWithMovieId,
-    deleteTagFromAllTags
+    deleteTagFromAllTags,
+    filterMovieids,
 }

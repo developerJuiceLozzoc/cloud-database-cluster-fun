@@ -2,9 +2,22 @@ function createMoviesTable() {
 return `DROP TABLE IF EXISTS movies;
 CREATE TABLE movies (
 epoch varchar(50) NOT NULL,
+episode int NOT NULL,
+title varchar(256) NOT NULL,
+year int NOT NULL,
+leecher varchar(30),
+filename varchar(200) NOT NULL,
+movieId SERIAL PRIMARY KEY,
+movie_size bigint NOT NULL);`
+}
+
+function createTvShowTable() {
+return `DROP TABLE IF EXISTS tvshows;
+CREATE TABLE tvshows (
+epoch varchar(50) NOT NULL,
 season int,
 episode int NOT NULL,
-title varchar(75) NOT NULL,
+title varchar(256) NOT NULL,
 year int NOT NULL,
 leecher varchar(30),
 filename varchar(200) NOT NULL,
@@ -63,7 +76,11 @@ class Movie {
         this.season = season ? parseInt(season) : null;
         this.leecher = publisher
         this.year = parseInt(year);
+        this.season = null;
 
+        if(season){
+          this.season = season
+        }
 
 
         //checking if invalid

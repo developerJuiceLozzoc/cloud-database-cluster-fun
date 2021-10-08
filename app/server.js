@@ -18,9 +18,12 @@ const { createMoviesTable,
 const { createBulkTags,
     createInsertMovieString,
     selectMovieIdsWithTags,
+    selectMoviesByManyIds,
+    readTagCount,
     readAllTags,
-    readAllMovies,
-    readAllTaggedMovies
+    readMovieCount,
+    readTaggedMoviesCount,
+    filterMovieids,
 } = require("./model/model.js")
 const {useClientToBulkInsert} = require("./sqlStringMaker.js")
 
@@ -102,23 +105,61 @@ app.get("/stream/:movieid",function(req,res){
  console.log(movieid);
 });
 
+app.get("/api/tags", async function(req,res){
+  let page = 1
+  try {
+    const pgclient = new Client()
+    await pgclient.connect()
+    let tags = await pgclient.query(readAllTags())
+    res.status(200).send({
+      tags: tags.rows,
+      next: page + 1,
+    })
+    await pgclient.end();
+  }
+  catch(e){
+      res.status(304).send(e)
+  }
+
+});
+
+app.get('/api/movies', async function(req,res){
+  const {movieids} = req.query;
+  try {
+    const pgclient = new Client()
+    await pgclient.connect()
+
+    tempresponse = await pgclient.query(selectMoviesByManyIds(movieids))
+    res.status(200).send(tempresponse.rows)
+    await pgclient.end();
+  }
+  catch(e){
+    console.log(e);
+      res.status(400).send()
+  }
+})
 
 app.get("/api/search/epoch", async function(req,res){
   res.end()
 });
 
+
 app.get("/api/search/movies", async function(req,res){
-  console.log(req.query);
+  const {andtags,ortags,type} = req.query;
   try {
     const pgclient = new Client()
     await pgclient.connect()
-    let tags = await pgclient.query(readAllTags())
-    let movies = await pgclient.query(selectMovieIdsWithTags(req.query.tags))
-    console.log(tags,movies)
-    res.status(200).send()
+    let tags = [];
+    tags.push(andtags ? andtags.split(","):  [])
+    tags.push(ortags ? ortags.split(","):  [])
+
+    let moviFilter = tags.flatMap((x)=>x)
+    tempresponse = await pgclient.query(selectMovieIdsWithTags(andtags,moviFilter.join(",")))
+    res.status(200).send(tempresponse.rows)
     await pgclient.end();
   }
   catch(e){
+    console.log(e);
       res.status(400).send()
   }
 })
@@ -127,18 +168,26 @@ app.listen(PORT,async function(){
   try {
     const pgclient = new Client()
     await pgclient.connect()
-    let tags = await pgclient.query(readAllTags())
-    let movies = await pgclient.query(readAllMovies())
-    let movietags = await pgclient.query(readAllTaggedMovies())
-    console.log(tags.rows,movies.rows,movietags.rows);
+
+    /* insert */
     // await pgclient.query(createMoviesTable())
     // await pgclient.query(createTagsRelationshipsTable())
-    // useClientToBulkInsert(pgclient)
+    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
+    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
+    /* end insert */
+
+    /* read count */
+    // let tags = await pgclient.query(readTagCount())
+    // let movies = await pgclient.query(readMovieCount())
+    // let movietags = await pgclient.query(readTaggedMoviesCount())
+    // console.log(tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
+    /*        */
 
     console.log("app is listening")
   }
   catch(e){
     console.log(e);
+      // await pgclient.end()
   }
 
 })
