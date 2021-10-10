@@ -65,12 +65,12 @@ function createWatchHistoryItem(stats){
 select movie ideas that contain all these tags
 
 */
-function selectMovieIdsWithTags(andtags,tags){
+function selectMovieIdsWithTags(andtags = [],tags){
     return `select movieId
         from MoviesWithTag
         where tagId in (${tags})
         group by movieId
-        having array_agg(tagId) @> array[${andtags}]`;
+        ${andtags.length > 0 ? `having array_agg(tagId) @> array[${andtags}];` : ';'}`;
 }
 
 /* movies is an array of movie ids and their crap

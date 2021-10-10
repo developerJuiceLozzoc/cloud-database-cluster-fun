@@ -1,7 +1,7 @@
 const fs = require('fs');
 const express = require("express")
 const app = express()
-const PORT = 3000
+const PORT = 4000
 const {Client} = require("pg");
 
 const {createReadstreamForPath,
@@ -111,6 +111,7 @@ app.get("/api/tags", async function(req,res){
     const pgclient = new Client()
     await pgclient.connect()
     let tags = await pgclient.query(readAllTags())
+    console.log(tags.rows.length);
     res.status(200).send({
       tags: tags.rows,
       next: page + 1,
@@ -153,9 +154,15 @@ app.get("/api/search/movies", async function(req,res){
     tags.push(andtags ? andtags.split(","):  [])
     tags.push(ortags ? ortags.split(","):  [])
 
+
     let moviFilter = tags.flatMap((x)=>x)
-    tempresponse = await pgclient.query(selectMovieIdsWithTags(andtags,moviFilter.join(",")))
-    res.status(200).send(tempresponse.rows)
+    console.log(moviFilter);
+    let tempresponse = await pgclient.query(selectMovieIdsWithTags(andtags,moviFilter.join(",")))
+    let ids = tempresponse.rows.map(function(item){
+      return item.movieid
+    })
+    let temp2response = await pgclient.query(selectMoviesByManyIds(ids.join(",")))
+    res.status(200).send(temp2response.rows)
     await pgclient.end();
   }
   catch(e){
@@ -177,10 +184,10 @@ app.listen(PORT,async function(){
     /* end insert */
 
     /* read count */
-    // let tags = await pgclient.query(readTagCount())
-    // let movies = await pgclient.query(readMovieCount())
-    // let movietags = await pgclient.query(readTaggedMoviesCount())
-    // console.log(tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
+    let tags = await pgclient.query(readTagCount())
+    let movies = await pgclient.query(readMovieCount())
+    let movietags = await pgclient.query(readTaggedMoviesCount())
+    console.log(tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
     /*        */
 
     console.log("app is listening")
