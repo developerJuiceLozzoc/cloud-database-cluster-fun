@@ -1,11 +1,14 @@
-import React,{useState} from 'react'
+import React,{useState,useMemo} from 'react'
 import {connect} from 'react-redux'
-import { css, cx } from '@emotion/css'
+import axios from 'axios';
 import queryString from "query-string"
+
 
 import {TagsSelector} from "../../reducers/selectors"
 import SpecialButton from "./FilterButton"
 import {setSearchResultsAction} from "../../actions"
+import {Button} from '@mui/material';
+import { useSelector } from 'react-redux'
 
 /**
  * Shuffles array in place.
@@ -24,6 +27,7 @@ function shuffle(a) {
 
 function TagSearchView(props){
   const [checked,setChecked] = useState({})
+  const tags = useSelector(TagsSelector)
 
   const postSearchRequest = (query) => {
     let querystuff = {}
@@ -33,25 +37,18 @@ function TagSearchView(props){
     if(query.ortags.length > 0 ){
       querystuff.ortags = query.ortags.join(",")
     }
-
-    fetch(`/api/search/movies?${queryString.stringify(querystuff)}`)
-    .then((res) => res.json())
-    .then(function(data){
-      props.setSearchResults(shuffle(data))
-    })
-    .catch((e)=>{})
+    if(query.ortags.length > 0 || query.andtags.length > 0 ){
+      axios.get(`/api/search/movies?${queryString.stringify(querystuff)}`)
+      .then(function(res){
+        console.log(res.data);
+        props.setSearchResults(shuffle(res.data))
+      })
+      .catch((e)=>{})
+    }
   }
-
-  return (<>
-    <p> Red means AND, Green means OR</p>
-    <div
-      className={css`
-       height: 100px;
-       flex-wrap: wrap;
-       overflow-y: auto;
-     `}
-   >
-    {props.tags.map(function(tag,index){
+  const TagButtons = useMemo(()=> {
+    console.log("RERENDERING TAGS");
+    return tags.map(function(tag,index){
       return  <SpecialButton
       key={`tagname-${tag.tagid}`}
       value={checked[tag.tagid]}
@@ -64,9 +61,20 @@ function TagSearchView(props){
         setChecked(newState)
       }}
     />
-    })}
+    })
+  }, [tags.length])
+
+  return (<>
+    <p> Red means AND, Green means OR</p>
+    <div
+
+   >
+    {tags.length > 0 && TagButtons }
    </div>
-    <button onClick={function(){
+    <Button
+      varient="contained"
+      color="success"
+      onClick={function(){
       let query = {
         andtags: [],
         ortags: [],
@@ -82,7 +90,7 @@ function TagSearchView(props){
         }
       })
       postSearchRequest(query)
-    }} >Search</button>
+    }} >Search</Button>
    </>
   );
 }
@@ -94,10 +102,5 @@ function mapDispatchToProps(dispatch){
   }
 }
 
-function mapStateToProps(state){
-  return {
-      tags: TagsSelector(state),
-  }
-}
 
-export default connect(mapStateToProps,mapDispatchToProps)(TagSearchView)
+export default connect(null,mapDispatchToProps)(TagSearchView)

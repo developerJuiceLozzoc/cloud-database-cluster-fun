@@ -66,6 +66,7 @@ select movie ideas that contain all these tags
 
 */
 function selectMovieIdsWithTags(andtags = [],tags){
+  console.log(tags);
     return `select movieId
         from MoviesWithTag
         where tagId in (${tags})
@@ -111,6 +112,7 @@ function filterMovieids(movies,filter){
 }
 
 function selectMoviesByManyIds(movieids){
+  console.log(`Movies in this amaount :${movieids}:`);
   return `SELECT * FROM movies WHERE movieId IN (${movieids})`;
 }
 

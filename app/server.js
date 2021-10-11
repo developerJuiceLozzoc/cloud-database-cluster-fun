@@ -90,19 +90,16 @@ app.get("/stream/:movieid",function(req,res){
   getFile(res,'/home/pi/Videos/movies/Fast And Furious/Fast.And.Furious.9. 2021 SomeCoontS.avi)
 })
 */
-app.get("/stream/:movieid",function(req,res){
-  // const {movieid} = req.params;
-  let movieid = '/home/pi/Videos/movies/Venom.Coast 2021 GalaxyRG.mkv'
-  // let movieid = '/home/pi/Videos/movies/The Matrix/The.Matrix.Reloaded 2003 anoXmous.mp4'
+app.get("/stream",function(req,res){
+  const {path,size} = req.query;
+  console.log(path);
  //  const headers = {
  //    "Accept-Ranges": "bytes",
  //    // "Content-Type": "video/mp4",
  // };
  // res.writeHead(206, headers);
- console.log(movieid);
 
- sshConnect(function(){     getFileStoE(res,movieid) } );
- console.log(movieid);
+ sshConnect(function(){  getFileStoE(res,path) } );
 });
 
 app.get("/api/tags", async function(req,res){
@@ -161,8 +158,12 @@ app.get("/api/search/movies", async function(req,res){
     let ids = tempresponse.rows.map(function(item){
       return item.movieid
     })
-    let temp2response = await pgclient.query(selectMoviesByManyIds(ids.join(",")))
-    res.status(200).send(temp2response.rows)
+    if(ids.length){
+      let temp2response = await pgclient.query(selectMoviesByManyIds(ids.join(",")))
+      res.status(200).send(temp2response.rows)
+    }else {
+      res.status(200).send([])
+    }
     await pgclient.end();
   }
   catch(e){

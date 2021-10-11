@@ -35,6 +35,7 @@ const setCurrentSearchResultTypeAction = (value) => {
 }
 
 const setSearchResultsAction = (results) => {
+  console.log("setting search results");
   return {
     type: SET_SEARCH_RESULTS,
     payload: results,

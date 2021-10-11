@@ -1,13 +1,52 @@
 import React from "react"
+import {connect} from "react-redux"
+import queryString from "query-string"
+
+
+import {CurrentSelectedMovieSelector} from "../../reducers/selectors"
+
 
 
 function PlainHtml5Viewr(props){
+  const [isWatching, toggleIsWatching] = React.useState(false);
+  React.useEffect(function(){
+    if(!!props.selectedvideo){
+      toggleIsWatching(false)
+    }
+  },[props.selectedvideo])
+
+  let query =  !!props.selectedvideo ? queryString.stringify({
+    size: props.selectedvideo.movie_size,
+    path: props.selectedvideo.filename
+  }) : null
   return (
-    <video controls width="500">
-    <source src={props.url}
-            type="video/mp4" />
-    Sorry, your browser doesn't support embedded videos.
-    </video>)
+    <div>
+      {!!props.selectedvideo && !isWatching && <div>
+        {Object.keys(props.selectedvideo).map(function(key){
+          return <div key={`video: ${key}`}><p>{props.selectedvideo[key]}</p></div>
+        })}
+        <button onClick={function(){ toggleIsWatching(true)}}>WatchNow!</button>
+        </div>
+      }
+      {!!props.selectedvideo && isWatching && <div>
+        <video controls width="100%">
+        <source src={`/stream?${query}`}
+                type="video/mp4" />
+        Sorry, your browser doesn't support embedded videos.
+        </video>
+        <button onClick={function(){ toggleIsWatching(false)}}>StopWatching</button>
+        </div>
+      }
+    </div>
+    )
 }
 
-export default PlainHtml5Viewr
+function mapStateToProps(state){
+  return {
+    selectedvideo: CurrentSelectedMovieSelector(state),
+  }
+}
+
+
+
+export default connect(mapStateToProps)(PlainHtml5Viewr)

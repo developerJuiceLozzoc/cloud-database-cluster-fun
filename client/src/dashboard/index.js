@@ -40,12 +40,12 @@ class Dashboard extends React.Component {
         <BottomNavigationAction label="Explore" icon={<ExploreIcon />} />
       </BottomNavigation>
       <Grid container spacing={2} sx={{ height: '85%' }}>
-        <Grid item xs={7}>
+        <Grid item xs={4}>
             {this.isLoadingCommercial && <p>Are you still watching? try out these fan favorites: </p> }
             {/*Column*/}<PlainHtml5Viewr url="/stream/asdf" />
 
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={8}>
 
           {/*browse menu, to find other files */}<MovieSearchCard />
 
