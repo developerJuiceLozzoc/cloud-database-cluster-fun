@@ -1,12 +1,42 @@
 import React from 'react'
 import {connect} from "react-redux"
+import { createBrowserHistory } from "history";
 import {BottomNavigation,BottomNavigationAction,Grid} from '@mui/material';
 import {Restore} from '@mui/icons-material'
 import ExploreIcon from '@mui/icons-material/Explore';
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import MovieSearchCard from "./components/MovieSearchCard"
 import PlainHtml5Viewr from "./components/PlainHtml5Viewr"
-import {setTagsAction} from "../actions"
+import RaspberryStatsView from "./components/RaspberryStatsView"
+import {setTagsAction,setPiHistoryAction} from "../actions"
+
+const Navbar = props => {
+  let history = useHistory();
+
+   return (
+     <BottomNavigation
+       showLabels
+       value={"Recents"}
+       onChange={(event, newValue) => {
+         if(newValue === 0){
+           history.push("/server")
+         }
+         else{
+           history.push("/movies")
+         }
+       }}
+       >
+       <BottomNavigationAction label="Server" icon={<Restore />} />
+       <BottomNavigationAction label="Explore" icon={<ExploreIcon />} />
+     </BottomNavigation>
+   )
+}
 
 class Dashboard extends React.Component {
   constructor(){
@@ -14,47 +44,47 @@ class Dashboard extends React.Component {
     this.state = {
       tags: [],
       isLoadingCommercial: false,
+      history: createBrowserHistory()
     }
     this.setValue = this.setValue.bind(this)
     this.handleLoadTags = this.handleLoadTags.bind(this)
+    this.handleLoadPiHistory = this.handleLoadPiHistory.bind(this)
   }
   componentDidMount() {
     this.handleLoadTags()
     this.handleLoadPiHistory()
     this.handleLoadUserHistory()
+    this.state.history.push("/movies")
   }
 
   render(){
     return (
-      <div>
+      <Router history={this.state.history}>
+      <div style={{height:"100%"}}>
       {/*row  bottom /inset top inset?*/}
+      <Navbar />
 
-      <BottomNavigation
-        showLabels
-        value={"Recents"}
-        onChange={(event, newValue) => {
-          this.setValue(newValue);
-        }}
-        >
-        <BottomNavigationAction label="Server" icon={<Restore />} />
-        <BottomNavigationAction label="Explore" icon={<ExploreIcon />} />
-      </BottomNavigation>
-      <Grid container spacing={2} sx={{ height: '85%' }}>
-        <Grid item xs={4}>
-            {this.isLoadingCommercial && <p>Are you still watching? try out these fan favorites: </p> }
-            {/*Column*/}<PlainHtml5Viewr url="/stream/asdf" />
 
+      <Route path="/server">
+        <RaspberryStatsView />
+      </Route>
+
+      <Route path="/movies">
+        <Grid container spacing={2} sx={{ height: '85%' }}>
+          <Grid item xs={4}>
+              {/*Column*/}<PlainHtml5Viewr url="/stream/asdf" />
+          </Grid>
+          <Grid item xs={8}>
+            {/*browse menu, to find other files */}<MovieSearchCard />
+          </Grid>
+          <Grid item xs={12}>
+            <p>xs=4</p>  {/*explore the current epoch selecte and related items, if none there than suggest random items*/}
+          </Grid>
         </Grid>
-        <Grid item xs={8}>
+      </Route>
 
-          {/*browse menu, to find other files */}<MovieSearchCard />
-
-        </Grid>
-        <Grid item xs={12}>
-          <p>xs=4</p>  {/*explore the current epoch selecte and related items, if none there than suggest random items*/}
-        </Grid>
-      </Grid>
       </div>
+      </Router>
     )
   }
 
@@ -70,7 +100,15 @@ class Dashboard extends React.Component {
     const userRecentItems = sessionStorage.getItem("Watch History")
   }
   handleLoadPiHistory(){
-
+    const self = this;
+    fetch('/api/getAllPiStats')
+    .then(res => res.json())
+    .then(function(data){
+      self.props.setPiHistory(data)
+    })
+    .catch(function(e){
+      console.log(e);
+    })
   }
   handleLoadTags(){
     const self = this;
@@ -87,7 +125,7 @@ class Dashboard extends React.Component {
 
 function mapDispatchToProps(dispatch){
   return {
-    setPiHistory: (history) => dispatch({type: "SETPIHISTORY"}),
+    setPiHistory: (history) => dispatch(setPiHistoryAction(history)),
     setTags: (tags) => dispatch(setTagsAction(tags)),
     setRelatedContent: (key,content) => dispatch({type:"RELATEDCONTENT"}),
   }

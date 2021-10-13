@@ -14,10 +14,10 @@ const didSelectMovieAction = (movie) => ({
 
 const SET_PI_CLUSTER_HISTORY = "HISTORY_SET_PI_CLUSTER"
 
-const setPiHistoryAction = (dict) => {
+const setPiHistoryAction = (arr) => {
   return {
     type: SET_PI_CLUSTER_HISTORY,
-    payload: dict
+    payload: arr
   }
 }
 

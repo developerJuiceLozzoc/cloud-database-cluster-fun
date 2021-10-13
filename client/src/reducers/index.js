@@ -9,8 +9,7 @@ import {
 
 export const initialState = {
   history: {
-    "pihistory": {
-    },
+    pi: []
 
   },
   search: {
@@ -54,6 +53,16 @@ function RootReducer(state = initialState.root ,action){
 
 function HistoryReducer(state = initialState.history, action){
   switch(action.type){
+    case SET_PI_CLUSTER_HISTORY:
+      return {
+        ...state,
+        pi: action.payload.map(function(stat){
+          return {
+            ...stat,
+            id: stat.date
+          }
+        })
+      }
     default:
       return state
   }

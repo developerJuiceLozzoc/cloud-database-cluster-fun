@@ -10,6 +10,7 @@
 
 # production
 /build
+#i need this cause raspberry pi doesnt have latest nodejs tobuild the app i think?
 
 # misc
 .DS_Store
