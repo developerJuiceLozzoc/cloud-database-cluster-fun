@@ -3,6 +3,7 @@ const express = require("express")
 const app = express()
 const PORT = 4000
 const {Client} = require("pg");
+const bp = require('body-parser')
 
 const {createReadstreamForPath,
   sshConnect,
@@ -12,7 +13,8 @@ const {createReadstreamForPath,
 const { createMoviesTable,
     createTagsTable,
     createTagsRelationshipsTable,
-    Movie
+    Movie,
+    createPiStatsTable,
 } = require("./model/schema.js");
 
 const { createBulkTags,
@@ -24,12 +26,22 @@ const { createBulkTags,
     readMovieCount,
     readTaggedMoviesCount,
     filterMovieids,
+    selectPiStatToUpdate,
+    selectStatsOfAllPis,
+    updatePiStatString,
+    createPiStatTimestampe,
 } = require("./model/model.js")
 const {useClientToBulkInsert} = require("./sqlStringMaker.js")
 
 
 app.use(express.static("../client/build"))
-
+app.use(bp.json())
+// app.use(function(req, res, next) {
+//   res.on('close', function() {
+//     console.log('close')
+//   })
+//   next()
+// })
 function getFileStoE(writeStream, remoteFile) {
   const readStream = createReadstreamForPath(remoteFile)
   readStream.pipe(writeStream)
@@ -102,6 +114,42 @@ app.get("/stream",function(req,res){
  sshConnect(function(){  getFileStoE(res,path) } );
 });
 
+app.post('/analytics/uptime', async function(req,res){
+  let info = req.body
+  try {
+    const pgclient = new Client()
+    await pgclient.connect()
+    console.log(info);
+    console.log(`Ip address from Express: ${req.ip}`);
+    console.log(`Local SubnetMask: ${info.submask}`);
+    //fetch existing stats based on the subnet mask given // also lets try inspect
+    // let query1 = selectPiStatToUpdate(info.submask)
+    let query1 = createPiStatTimestampe(info)
+    let getresponce = await pgclient.query(query1.text,query1.values)
+    // let query2 = updatePiStatString(info)
+    // let updater3eponse = await pgclient.query(query2.text,query1.values)
+    //update its status, this should happen once every
+    res.status(201).end()
+  }
+  catch(e){
+    console.log(e);
+    res.status(300).end()
+  }
+})
+
+app.get("/api/getAllPiStats", async function(req,res){
+  let info = req.body
+  try {
+    const pgclient = new Client()
+    await pgclient.connect()
+    let tempresponse = await pgclient.query(selectStatsOfAllPis())
+    res.status(200).send(tempresponse.rows)
+  }
+  catch(e){
+    console.log(e);
+  }
+})
+
 app.get("/api/tags", async function(req,res){
   let page = 1
   try {
@@ -134,6 +182,7 @@ app.get('/api/movies', async function(req,res){
   catch(e){
     console.log(e);
       res.status(400).send()
+      await pgclient.end();
   }
 })
 
@@ -180,6 +229,7 @@ app.listen(PORT,async function(){
     /* insert */
     // await pgclient.query(createMoviesTable())
     // await pgclient.query(createTagsRelationshipsTable())
+    // await pgclient.query(createPiStatsTable())
     // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
     // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
     /* end insert */
@@ -191,7 +241,7 @@ app.listen(PORT,async function(){
     console.log(tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
     /*        */
 
-    console.log("app is listening")
+    console.log("app is listening",PORT)
   }
   catch(e){
     console.log(e);

@@ -42,6 +42,13 @@ function createInsertMovieString(movie){
 	}
 }
 
+function createPiStatTimestampe(stats){
+  return {
+    text: `INSERT INTO CLUSTER_STATS(submask,cpuload,osuptime,processuptime,osname,cpus,date) VALUES($1,$2,$3,$4,$5,$6,$7)`,
+    values: [stats.submask,stats.load,parseInt(stats['os-uptime']),parseInt(stats['process-uptime']),stats.osName,JSON.stringify(stats.cpus),Date.now()]
+  }
+}
+
 function createMovieTagLinksString(movieId,tagIds){
   return tagIds.map(function(tag){
     return {
@@ -60,6 +67,16 @@ function createWatchHistoryItem(stats){
   }
 }
 
+function selectStatsOfAllPis(){
+  return `SELECT * FROM CLUSTER_STATS;`
+}
+
+function selectPiStatToUpdate(subnetid){
+  return {
+    text: `SELECT * FROM CLUSTER_STATS WHERE subnet=$1`,
+    values: [subnetid]
+  }
+}
 
 /*
 select movie ideas that contain all these tags
@@ -151,6 +168,15 @@ function readTaggedMoviesCount() {
 }
 
 
+function updatePiStatString(values){
+  return {
+    text: `UPDATE CLUSTER_STATS
+            SET uptime = $1, cpuload = $2 , osuptime = $3
+            WHERE condition;`,
+    values: [values['process-uptime'],values[load.join(",")],values['os-uptime']],
+  }
+}
+
 function deleteTagFromAllTags(tag) {
     return {
         values: [tag],
@@ -163,13 +189,17 @@ module.exports = {
     createInsertMovieString,
     createMovieTagLinksString,
     createBulkTags,
+    createPiStatTimestampe,
     readAllTags,
     readTagCount,
     readMovieCount,
     readTaggedMoviesCount,
+    selectPiStatToUpdate,
+    selectStatsOfAllPis,
     selectMovieIdsWithTags,
     selectMoviesByManyIds,
     selectTagIdsWithMovieId,
+    updatePiStatString,
     deleteTagFromAllTags,
     filterMovieids,
 }

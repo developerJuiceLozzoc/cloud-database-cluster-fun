@@ -25,6 +25,19 @@ movieId SERIAL PRIMARY KEY,
 movie_size bigint NOT NULL);`
 }
 
+function createPiStatsTable(){
+  return `DROP TABLE IF EXISTS CLUSTER_STATS;
+  CREATE TABLE CLUSTER_STATS (
+    submask varchar(16) NOT NULL,
+    cpuload varchar(16) NOT NULL,
+    osuptime bigint,
+    processuptime bigint,
+    osname varchar(16),
+    cpus  varchar(256),
+    date bigint NOT NULL
+  );`
+}
+
 function createWatchHistoryTable(){
   return `DROP TABLE IF EXISTS WatchHistory;
   CREATE TABLE WatchHistory(
@@ -89,6 +102,7 @@ class Movie {
 }
 
 module.exports = {
+  createPiStatsTable,
   createWatchHistoryTable,
     createMoviesTable,
     createTagsTable,
