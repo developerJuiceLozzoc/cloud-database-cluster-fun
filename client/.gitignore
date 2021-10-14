@@ -9,9 +9,9 @@
 /coverage
 
 # production
-/build
+#/build
 #i need this cause raspberry pi doesnt have latest nodejs tobuild the app i think?
-
+# pi doesnt have enough memory to build the app
 # misc
 .DS_Store
 .env.local
