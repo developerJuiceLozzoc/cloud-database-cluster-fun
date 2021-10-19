@@ -57,9 +57,14 @@ function HistoryReducer(state = initialState.history, action){
       return {
         ...state,
         pi: action.payload.map(function(stat){
+          let date = new Date(parseInt(stat.date));
+          let datearr = date.toString().split(" ")
           return {
             ...stat,
-            id: stat.date
+            id: stat.date,
+            processuptime: (parseInt(stat.processuptime) / 3600).toFixed(2),
+            osuptime: (parseInt(stat.osuptime) / 3600).toFixed(2),
+            date: `${datearr[1]} ${datearr[2]} @ ${datearr[4]}`
           }
         })
       }

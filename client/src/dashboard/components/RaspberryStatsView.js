@@ -9,14 +9,13 @@ const columns: GridColDef[] = [
     { field: 'osname', headerName: 'OS',width: 150 },
 
   { field: 'cpuload', headerName: 'Load(~5min)',width: 150},
-  { field: 'processuptime', headerName: 'pUptime',width: 150},
-  { field: 'osuptime', headerName: 'oUptime' ,width: 150},
+  { field: 'processuptime', headerName: 'pUptime (Hours)',width: 150},
+  { field: 'osuptime', headerName: 'oUptime (Hours)' ,width: 150},
   { field: 'date', headerName: 'Date',width: 150 },
 ];
 
 
 function RaspberryStatsView(props){
-  console.log(props.items);
   return (
     <div style={{height: "90vh"}}>
     {props.items.length === 0 &&

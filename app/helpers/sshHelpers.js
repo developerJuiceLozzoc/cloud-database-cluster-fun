@@ -1,6 +1,6 @@
 var sshClient = require('ssh2').Client;
 const sshConfig = {
-     host: '10.0.0.206',
+     host: process.env.PGHOST,
      port: 22, // Normal is 22 port
      username: 'pi',
      password: 'cloud[:P]wifi'
@@ -44,5 +44,5 @@ module.exports = {
   sshConnect,
   sshDisconnect,
   createReadstreamForPath,
-  
+
 }

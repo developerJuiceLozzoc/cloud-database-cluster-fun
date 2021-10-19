@@ -8,7 +8,7 @@ const bp = require('body-parser')
 const {createReadstreamForPath,
   sshConnect,
   sshDisconnect
-} = require("./sshHelpers")
+} = require("./helpers/sshHelpers")
 
 const { createMoviesTable,
     createTagsTable,
