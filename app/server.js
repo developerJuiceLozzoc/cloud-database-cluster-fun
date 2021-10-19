@@ -1,7 +1,7 @@
 const fs = require('fs');
 const express = require("express")
 const app = express()
-const PORT = 4000
+const PORT = process.env.PROXY_PORT || 4000;
 const {Client} = require("pg");
 const bp = require('body-parser')
 
@@ -240,7 +240,7 @@ app.listen(PORT,async function(){
     let movietags = await pgclient.query(readTaggedMoviesCount())
     console.log(tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
     /*        */
-
+    require("./helpers/clusterReporting")
     console.log("app is listening",PORT)
   }
   catch(e){

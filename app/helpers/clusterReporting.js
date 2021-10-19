@@ -2,8 +2,8 @@ const axios = require("axios");
 const cron = require("node-cron")
 const os = require("os")
 const {foobar} = require("./ipprint")
-const ARCHAEIC_URL = process.env.SERVER_URL;
-const PORT = process.env.SERVER_PORT
+const ARCHAEIC_URL = process.env.COLLECTION_URL;
+const PORT = process.env.COLLECTION_PORT
 const AUTH_TOKEN = 'bearer'
 const localip  = foobar("http","0.0.0.0",PORT).localUrlForTerminal;
 
@@ -15,7 +15,7 @@ console.log("NODE SPINNING UP");
 
 
 
-cron.schedule('*/1 * * * *', function(){
+cron.schedule('*/5 * * * *', function(){
   console.log("FIRING ANALYTICS");
   let cpus = {}
   os.cpus().forEach(function(cpu){
