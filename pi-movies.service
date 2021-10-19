@@ -1,0 +1,20 @@
+[Unit]
+Description=description
+After=network.target
+
+[Service]
+Environment=“PGHOST=10.0.0.223”
+Environment=“PGUSER=root”
+Environment=“PGPASSWORD=password”
+Environment=“COLLECTION_URL=10.0.0.223”
+Environment=“COLLECTION_PORT=3000”
+Environment=“PROXY_PORT=80”
+StandardOutput=inherit
+Type=simple
+User=pi
+ExecStart=/home/pi/.nvm/versions/node/v16.11.1/bin/node /home/pi/Documents/cloud-database-cluster-fun/app/server.js
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
