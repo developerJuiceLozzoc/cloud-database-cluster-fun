@@ -17,6 +17,8 @@ PGUSER=
 PGPASSWORD=
 PORT=
 */
+app.use(bp.json())
+
 
 app.post('/analytics/uptime', async function(req,res){
   let info = req.body
