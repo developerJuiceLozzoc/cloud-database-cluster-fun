@@ -6,11 +6,10 @@ import {PiHistorySelector} from "../../reducers/selectors";
 
 const columns: GridColDef[] = [
   { field: 'submask', headerName: 'Subnet Mask',width: 150 },
-    { field: 'osname', headerName: 'OS',width: 150 },
+  { field: 'osname', headerName: 'OS',width: 200 },
 
   { field: 'cpuload', headerName: 'Load(~5min)',width: 150},
-  { field: 'processuptime', headerName: 'pUptime (Hours)',width: 150},
-  { field: 'osuptime', headerName: 'oUptime (Hours)' ,width: 150},
+  { field: 'processuptime', headerName: 'pUptime (Hours)',width: 200},
   { field: 'date', headerName: 'Date',width: 150 },
 ];
 

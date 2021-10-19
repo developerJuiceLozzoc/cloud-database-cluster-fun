@@ -24,7 +24,7 @@ console.log("NODE SPINNING UP");
 
 
 
-cron.schedule('*/5 * * * *', function(){
+cron.schedule('*/1 * * * *', function(){
   console.log("FIRING ANALYTICS");
   let cpus = {}
   os.cpus().forEach(function(cpu){
@@ -43,7 +43,7 @@ cron.schedule('*/5 * * * *', function(){
     url: `http://${ARCHAEIC_URL}:${PORT}/analytics/uptime`,
     data: {
       cpus,
-      'osName': `${os.type()}/${os.platform()}`,
+      'osName': `${os.type()}/${os.hostname()}`,
       load: os.loadavg()[1],
       submask: localip,
       'process-uptime': process.uptime(),
