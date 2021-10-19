@@ -114,28 +114,6 @@ app.get("/stream",function(req,res){
  sshConnect(function(){  getFileStoE(res,path) } );
 });
 
-app.post('/analytics/uptime', async function(req,res){
-  let info = req.body
-  try {
-    const pgclient = new Client()
-    await pgclient.connect()
-    console.log(info);
-    console.log(`Ip address from Express: ${req.ip}`);
-    console.log(`Local SubnetMask: ${info.submask}`);
-    //fetch existing stats based on the subnet mask given // also lets try inspect
-    // let query1 = selectPiStatToUpdate(info.submask)
-    let query1 = createPiStatTimestampe(info)
-    let getresponce = await pgclient.query(query1.text,query1.values)
-    // let query2 = updatePiStatString(info)
-    // let updater3eponse = await pgclient.query(query2.text,query1.values)
-    //update its status, this should happen once every
-    res.status(201).end()
-  }
-  catch(e){
-    console.log(e);
-    res.status(300).end()
-  }
-})
 
 app.get("/api/getAllPiStats", async function(req,res){
   let info = req.body
@@ -227,6 +205,7 @@ app.listen(PORT,async function(){
     await pgclient.connect()
 
     /* insert */
+    // await pgclient.query(createPiStatsTable())
     // await pgclient.query(createMoviesTable())
     // await pgclient.query(createTagsRelationshipsTable())
     // await pgclient.query(createPiStatsTable())

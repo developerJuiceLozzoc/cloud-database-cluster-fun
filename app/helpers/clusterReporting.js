@@ -5,7 +5,16 @@ const {foobar} = require("./ipprint")
 const ARCHAEIC_URL = process.env.COLLECTION_URL;
 const PORT = process.env.COLLECTION_PORT
 const AUTH_TOKEN = 'bearer'
-const localip  = foobar("http","0.0.0.0",PORT).localUrlForTerminal;
+const localip  = foobar("http","0.0.0.0",PORT).lanUrlForTerminal;
+console.log(foobar("http","0.0.0.0",PORT));
+console.log({
+  cpus: [],
+  'osName': `${os.type()}/${os.platform()}`,
+  load: os.loadavg()[1],
+  submask: localip,
+  'process-uptime': process.uptime(),
+  'os-uptime': require('os').uptime(),
+});
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${AUTH_TOKEN}`;
