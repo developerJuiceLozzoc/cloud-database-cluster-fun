@@ -27,6 +27,10 @@ export const initialState = {
   },
 }
 
+function selected_xor(currid,nextid){
+
+}
+
 function RootReducer(state = initialState.root ,action){
   switch(action.type){
     case SET_TAGS:

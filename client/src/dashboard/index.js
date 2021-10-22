@@ -15,6 +15,7 @@ import MovieSearchCard from "./components/MovieSearchCard"
 import PlainHtml5Viewr from "./components/PlainHtml5Viewr"
 import RaspberryStatsView from "./components/RaspberryStatsView"
 import {setTagsAction,setPiHistoryAction} from "../actions"
+import { css, cx } from '@emotion/css'
 
 const Navbar = props => {
   let history = useHistory();
@@ -36,6 +37,30 @@ const Navbar = props => {
        <BottomNavigationAction label="Explore" icon={<ExploreIcon />} />
      </BottomNavigation>
    )
+}
+
+const MiorrorNavBar = (props) => {
+  const mirrorContainer=css`
+  display: flex;
+  flex-wrap: no-wrap;
+  flex-direction: row;
+  `;
+  let mirrors = ["http://10.0.0.114","http://10.0.0.92","http://10.0.0.237"]
+
+  return (
+    <div>
+    <p>MIRRORS</p>
+    <div className={mirrorContainer}>
+    {mirrors.map(function(url,index){
+      return <button onClick={function(){
+        window.location.href = url;
+      }}
+      key={url}
+      >
+      Mirror {index+1}</button>
+    })}
+    </div>
+</div>)
 }
 
 class Dashboard extends React.Component {
@@ -62,6 +87,7 @@ class Dashboard extends React.Component {
       <Router history={this.state.history}>
       <div style={{height:"100%"}}>
       {/*row  bottom /inset top inset?*/}
+      <MiorrorNavBar />
       <Navbar />
 
 
