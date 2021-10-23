@@ -50,9 +50,9 @@ app.get('/stream', async function(req,res){
   const videoPath = path;
   // const videoSize = fs.statSync(videoPath).size;
   const CHUNK_SIZE = (10 ** 6) * 2; // 1MB
+  console.log(path,size);
 
     const start = Number(range.replace(/\D/g, ""));
-
     const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
     const contentLength = end - start + 1;
     const headers = {
@@ -60,10 +60,17 @@ app.get('/stream', async function(req,res){
       "Content-Length": contentLength,
       "Accept-Ranges": "bytes",
     };
-    // res.writeHead(206, headers);
 
-    const videoStream = fs.createReadStream(videoPath, { start, end });
-    // videoStream.pipe(res)
+
+    try{
+      res.writeHead(206, headers);
+      const videoStream = fs.createReadStream(videoPath, { start, end });
+      videoStream.pipe(res)
+    }
+    catch(e){
+      res.status(500).send(e)
+    }
+
 
 })
 

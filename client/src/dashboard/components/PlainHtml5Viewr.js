@@ -14,11 +14,15 @@ function PlainHtml5Viewr(props){
       toggleIsWatching(false)
     }
   },[props.selectedvideo])
-
+  //.replace("/home/pi/Videos/","/home/pi/Desktop/My Passport/videos/")
   let query =  !!props.selectedvideo ? queryString.stringify({
     size: props.selectedvideo.movie_size,
-    path: props.selectedvideo.filename
-  }) : null
+    path: props.selectedvideo.filename.replace("/home/pi/Videos/","/run/media/pi/My Passport/videos/"),
+  }) : null;
+
+  if(!!props.selectedvideo){
+    console.log(`http://10.0.0.227:4444/stream?${query}`);
+  }
   return (
     <div>
       {!!props.selectedvideo && !isWatching && <div>
@@ -30,7 +34,7 @@ function PlainHtml5Viewr(props){
       }
       {!!props.selectedvideo && isWatching && <div>
         <video controls width="100%">
-        <source src={`/stream?${query}`}
+        <source src={`http://10.0.0.227:4444/stream?${query}`}
                 type="video/mp4" />
         Sorry, your browser doesn't support embedded videos.
         </video>

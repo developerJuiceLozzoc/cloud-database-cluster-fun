@@ -8,4 +8,4 @@ RUN npm ci
 
 COPY . /home/app
 
-CMD node server.js
+CMD node collectionAndDistribution.js
