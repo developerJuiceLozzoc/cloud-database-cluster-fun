@@ -3,8 +3,12 @@ import {
   DID_SELECT_MOVIE,
   SET_TAGS,
   SET_PI_CLUSTER_HISTORY,
-  SET_SEARCH_RESULTS
+  SET_SEARCH_RESULTS,
+  SET_PI_NAMES
 } from "../actions"
+
+
+export const mirrors = ["10.0.0.114","10.0.0.92","10.0.0.237"]
 
 
 export const initialState = {
@@ -67,17 +71,21 @@ function HistoryReducer(state = initialState.history, action){
     case SET_PI_CLUSTER_HISTORY:
       return {
         ...state,
-        pi: action.payload.map(function(stat){
+        stats: action.payload.map(function(stat){
           let date = new Date(parseInt(stat.date));
           let datearr = date.toString().split(" ")
           return {
             ...stat,
             id: stat.date,
             processuptime: (parseInt(stat.processuptime) / 3600).toFixed(2),
-            osuptime: (parseInt(stat.osuptime) / 3600).toFixed(2),
             date: `${datearr[1]} ${datearr[2]} @ ${datearr[4]}`
           }
         })
+      }
+    case SET_PI_NAMES:
+      return {
+        ...state,
+        names: action.payload,
       }
     default:
       return state

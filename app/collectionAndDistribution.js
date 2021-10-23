@@ -125,6 +125,7 @@ app.listen(PORT,async function(){
     /*        */
 
     await pgclient.end()
+    require('./helpers/clusterReporting.js')
     console.log("app is listening",PORT)
   }
   catch(e){

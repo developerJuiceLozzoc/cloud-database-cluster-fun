@@ -39,11 +39,16 @@ axios({
   url: `http://${ARCHAEIC_URL}:${PORT}/api/analytics/uptime`,
   data: initialPing,
 })
+.then(function(){
+  console.log("ssad;ifj");
+})
+.catch(function(e){
+  console.log('connection failed to arhcaeic server');
+})
 
 
 
-cron.schedule('*/1 * * * *', function(){
-  console.log("FIRING ANALYTICS");
+cron.schedule('*/5 * * * *', function(){
 
   axios({
     method: 'post',

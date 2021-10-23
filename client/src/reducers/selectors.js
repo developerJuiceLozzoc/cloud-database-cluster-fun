@@ -22,15 +22,20 @@ function CurrentSearchResultsTypeSelector(state){
 }
 
 function PiHistorySelector(state){
-  return state.history.pi
+  return state.history.stats
 }
 
 function CurrentSelectedMovieSelector(state){
   return state.root.selectedmovie;
 }
 
+function PiIdentitiesSelector(state){
+  return state.history.names
+}
+
 
 export {
+  PiIdentitiesSelector,
   CurrentSelectedMovieSelector,
 SearchResultsSelector,
 PiHistorySelector,

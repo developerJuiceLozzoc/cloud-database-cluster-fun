@@ -12,9 +12,10 @@ import { useHistory } from "react-router-dom";
 import MovieSearchCard from "./components/MovieSearchCard"
 import PlainHtml5Viewr from "./components/PlainHtml5Viewr"
 import RaspberryStatsView from "./components/RaspberryStatsView"
-import {setTagsAction,setPiHistoryAction} from "../actions"
+import {setTagsAction,setPiHistoryAction,setPiNamesAction} from "../actions"
 import { css } from '@emotion/css'
 import TopLevelMirrorStyles from "./style/mirror.js"
+import {mirrors} from "../reducers"
 const Navbar = props => {
   let history = useHistory();
 
@@ -45,7 +46,7 @@ const MiorrorNavBar = (props) => {
     flex-direction: row;
   `;
   const selectedButtonStyle = css`
-  border-color: 'green';
+    color: green;
   `;
   const unselectedButtonStyle = css`
   border-color: #121212;
@@ -54,11 +55,10 @@ const MiorrorNavBar = (props) => {
 
   // const mirrorButtonSelectedStyle=css`
   // `;
-  let mirrors = ["10.0.0.114","10.0.0.92","10.0.0.237"]
 
   return (
     <div className={TopLevelMirrorStyles}>
-      <p>MIRRORS</p>
+      <p>MIRRORS - Click if search results are slow</p>
       <div className={`${mirrorContainer} container`}>
         <button
           className={`btn play-pause ${host.includes('localhost:3000') ? selectedButtonStyle : unselectedButtonStyle}`}
@@ -161,10 +161,18 @@ class Dashboard extends React.Component {
   }
   handleLoadPiHistory(){
     const self = this;
-    fetch('/api/getAllPiStats')
+    fetch('/api/pies/stats')
     .then(res => res.json())
     .then(function(data){
       self.props.setPiHistory(data)
+    })
+    .catch(function(e){
+      console.log(e);
+    })
+    fetch('/api/pies/names')
+    .then(res => res.json())
+    .then(function(data){
+      self.props.setPiNames(data)
     })
     .catch(function(e){
       console.log(e);
@@ -188,6 +196,7 @@ function mapDispatchToProps(dispatch){
     setPiHistory: (history) => dispatch(setPiHistoryAction(history)),
     setTags: (tags) => dispatch(setTagsAction(tags)),
     setRelatedContent: (key,content) => dispatch({type:"RELATEDCONTENT"}),
+    setPiNamesAction: (stuff) => dispatch(setPiNamesAction(stuff))
   }
 }
 
