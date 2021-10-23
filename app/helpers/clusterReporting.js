@@ -7,47 +7,51 @@ const PORT = process.env.COLLECTION_PORT
 const AUTH_TOKEN = 'bearer'
 const localip  = foobar("http","0.0.0.0",PORT).lanUrlForTerminal;
 console.log(foobar("http","0.0.0.0",PORT));
-console.log({
-  cpus: [],
-  'osName': `${os.type()}/${os.platform()}`,
-  load: os.loadavg()[1],
-  submask: localip,
-  'process-uptime': process.uptime(),
-  'os-uptime': require('os').uptime(),
-});
+
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${AUTH_TOKEN}`;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-
-console.log("NODE SPINNING UP");
+let cpus = {}
+os.cpus().forEach(function(cpu){
+  if( cpus[`${cpu.model}`] ){
+      cpus[`${cpu.model}`].count += 1;
+  }
+  else{
+     cpus[`${cpu.model}`] = {
+       count: 1,
+       speed: `${cpu.speed} Mhz`,
+     }
+  }
+})
+let initialPing = {
+    cpus: JSON.stringify(cpus),
+    arch: os.arch(),
+    submask: localip,
+    hostname: os.hostname(),
+    release: os.release(),
+    version: os.version(),
+    ostype: os.type(),
+}
+console.log(initialPing);
+axios({
+  method: 'post',
+  url: `http://${ARCHAEIC_URL}:${PORT}/api/analytics/uptime`,
+  data: initialPing,
+})
 
 
 
 cron.schedule('*/1 * * * *', function(){
   console.log("FIRING ANALYTICS");
-  let cpus = {}
-  os.cpus().forEach(function(cpu){
-    if( cpus[`${cpu.model}`] ){
-        cpus[`${cpu.model}`].count += 1;
-    }
-    else{
-       cpus[`${cpu.model}`] = {
-         count: 1,
-         speed: `${cpu.speed} Mhz`,
-       }
-    }
-  })
+
   axios({
     method: 'post',
-    url: `http://${ARCHAEIC_URL}:${PORT}/analytics/uptime`,
+    url: `http://${ARCHAEIC_URL}:${PORT}/api/analytics/uptime`,
     data: {
-      cpus,
-      'osName': `${os.type()}/${os.hostname()}`,
       load: os.loadavg()[1],
       submask: localip,
       'process-uptime': process.uptime(),
-      'os-uptime': require('os').uptime(),
     }}
   )
   .then(function(){

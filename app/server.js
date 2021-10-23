@@ -1,11 +1,14 @@
-const fs = require('fs');
-const express = require("express")
-const app = express()
 const PORT = process.env.PROXY_PORT || 4000;
 const ARCHAEIC_URL = process.env.COLLECTION_URL;
 const COLLECTION_PORT = process.env.COLLECTION_PORT;
+
+const fs = require('fs');
+const express = require("express")
 const {Client} = require("pg");
 const bp = require('body-parser')
+const axios = require('axios')
+
+const app = express()
 
 const {createReadstreamForPath,
   sshConnect,
@@ -15,8 +18,8 @@ const {createReadstreamForPath,
 const { createMoviesTable,
     createTagsTable,
     createTagsRelationshipsTable,
+    createTvShowTable,
     Movie,
-    createPiStatsTable,
 } = require("./model/schema.js");
 
 const { createBulkTags,
@@ -40,23 +43,37 @@ app.use(express.static("../client/build"))
 app.use(bp.json())
 
 
-// pass them off to the streaming server, its kind of lagey but at least the database queries dont slow it down
+// should not get here anymore but this
+// is still the general idea to
+//pass them off to the streaming server, its kind of lagey but at least the database queries dont slow it down
 app.get("/stream",function(req,res){
- res.redirect(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}${req.url}`)
+  res.status(301).end()
+ // res.redirect(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}${req.url}`)
 });
 
 
-app.get("/api/getAllPiStats", async function(req,res){
-  let info = req.body
-  try {
-    const pgclient = new Client()
-    await pgclient.connect()
-    let tempresponse = await pgclient.query(selectStatsOfAllPis())
-    res.status(200).send(tempresponse.rows)
-  }
-  catch(e){
-    console.log(e);
-  }
+app.get("/api/pies/stats", async function(req,res){
+  // res.redirect(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}${req.url}`)
+  axios.get(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}/api/pies/stats`)
+  .then(function(data){
+    console.log(data);
+    res.status(200).send(data.data)
+  })
+  .catch(function(e){
+    res.status(500).end()
+  })
+})
+
+app.get('/api/pies/names', async function(req,res){
+  axios
+  .get(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}/api/pies/names`)
+  .then(function(data){
+    console.log(data);
+    res.status(200).send(data.data)
+  })
+  .catch(function(e){
+    res.status(500).end()
+  })
 })
 
 app.get("/api/tags", async function(req,res){

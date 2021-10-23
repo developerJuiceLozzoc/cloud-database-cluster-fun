@@ -27,8 +27,15 @@ export const initialState = {
   },
 }
 
-function selected_xor(currid,nextid){
-
+export function selected_xor(currid,nextid){
+  if(!currid){
+    return true
+  } else if(currid.movieid === nextid){
+    return false
+  }
+  else {
+    return true
+  }
 }
 
 function RootReducer(state = initialState.root ,action){
@@ -39,7 +46,7 @@ function RootReducer(state = initialState.root ,action){
         nextTagPage: action.payload.next
       }
     case DID_SELECT_MOVIE:
-      if(state.selectedmovie && state.selectedmovie.movieid == action.payload.movieid){
+    if(!selected_xor(state.selectedmovie,action.payload.movieid)) {
         return {
           ...state,
           selectedmovie: null

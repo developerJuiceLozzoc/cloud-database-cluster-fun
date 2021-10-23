@@ -1,4 +1,4 @@
-import React,{useState,useMemo} from 'react'
+import React,{useState} from 'react'
 import {connect} from 'react-redux'
 import axios from 'axios';
 import queryString from "query-string"
@@ -46,9 +46,7 @@ function TagSearchView(props){
       .catch((e)=>{})
     }
   }
-  const TagButtons = useMemo(()=> {
-    console.log("RERENDERING TAGS");
-    return tags.map(function(tag,index){
+  const TagButtons = tags.map(function(tag,index){
       return  <SpecialButton
       key={`tagname-${tag.tagid}`}
       value={checked[tag.tagid]}
@@ -61,8 +59,7 @@ function TagSearchView(props){
         setChecked(newState)
       }}
     />
-    })
-  }, [tags.length])
+  })
 
   return (<>
     <p> Red means AND, Green means OR</p>
@@ -82,11 +79,15 @@ function TagSearchView(props){
       Object.keys(checked).filter(function(key){
         return checked[key] > 0
       }).forEach(function(key){
-        if(checked[key] == 1){
-          query.ortags.push(key)
-        }
-        else if(checked[key] == 2){
-          query.andtags.push(key)
+        switch(checked[key]){
+          case 1:
+            query.ortags.push(key)
+            break;
+          case 2:
+            query.andtags.push(key)
+            break;
+          default:
+            break;
         }
       })
       postSearchRequest(query)

@@ -1,6 +1,7 @@
 import React from 'react'
 import {connect} from "react-redux"
-import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid';
+import {Grid} from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {PiHistorySelector} from "../../reducers/selectors";
 
 
@@ -15,18 +16,26 @@ const columns: GridColDef[] = [
 
 function RaspberryStatsView(props){
   return (
-    <div style={{height: "90vh"}}>
-    {props.items.length === 0 &&
-      <p> loading your stats please wait </p>}
-    {props.items.length > 0 &&
-      <DataGrid
-      rows={props.items}
-      columns={columns}
-      onSelectionModelChange={(newSelection) => {
-        props.didSelectMovie(props.items[newSelection[0]])
-      }}
-      />}
-    </div>
+    <Grid container spacing={2} sx={{ height: '90vh' }}>
+      <Grid item xs={4}>
+          {/*Column*/}{!!props.selectedpi && <div>
+            {Object.keys(props.selectedpi).map(function(key){
+              return <div key={`video: ${key}`}><p>{props.selectedpi[key]}</p></div>
+            })}
+            </div>
+          }
+      </Grid>
+      <Grid item xs={8}>
+        {/*browse menu, to find other files */}<DataGrid
+        rows={props.items}
+        columns={columns}
+        onSelectionModelChange={(newSelection) => {
+          props.didSelectMovie(props.items[newSelection[0]])
+        }}
+        />
+      </Grid>
+
+    </Grid>
   )
 }
 

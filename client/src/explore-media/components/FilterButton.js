@@ -1,9 +1,9 @@
 import React from 'react'
-import { css, cx } from '@emotion/css'
+import { css } from '@emotion/css'
 
 function SpecialButton(props){
   const {value,setValue} = props;
-  const [varient,updateVarientEnum] = React.useState(0);
+  const [varient,updateVarientEnum] = React.useState(value);
   const getColorOnValue = (value) => {
     switch(value) {
       case 1:

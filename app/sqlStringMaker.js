@@ -30,9 +30,9 @@ function useClientToBulkInsert(client,filepath){
         if(movie.isInvalid || !movieString){
           console.log(movie,movieString);
         }
-        // if(movie.filename.length > 200 || movie.leecher.length > 30 || movie.epoch.length > 50 || movie.title.length > 256) {
-        //   console.log(movie);
-        // }
+        if(movie.filename.length > 200 || movie.leecher.length > 30 || movie.epoch.length > 50 || movie.title.length > 256) {
+          console.log(movie);
+        }
         // console.log(movie);
         const {rows} = await client.query(movieString.text,movieString.values)
         if(rows.length > 0 ){

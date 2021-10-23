@@ -1,3 +1,7 @@
+/*
+legacy code, no longer streams sftp to client.
+now we entirely buffer the code with nodejs
+*/
 var sshClient = require('ssh2').Client;
 const sshConfig = {
      host: process.env.PGHOST,

@@ -44,8 +44,15 @@ function createInsertMovieString(movie){
 
 function createPiStatTimestampe(stats){
   return {
-    text: `INSERT INTO CLUSTER_STATS(submask,cpuload,osuptime,processuptime,osname,cpus,date) VALUES($1,$2,$3,$4,$5,$6,$7)`,
-    values: [stats.submask,stats.load,parseInt(stats['os-uptime']),parseInt(stats['process-uptime']),stats.osName,JSON.stringify(stats.cpus),Date.now()]
+    text: `INSERT INTO CLUSTER_STATS(submask,cpuload,processuptime,date) VALUES($1,$2,$3,$4)`,
+    values: [stats.submask,stats.load,parseInt(stats['process-uptime']), Date.now()]
+  }
+}
+
+function createPiIdentityRecord(info){
+  return {
+    text: `INSERT INTO raspberrypis(submask,cpus,hostname,release,version,ostype) VALUES($1,$2,$3,$4,$5,$6)`,
+    values: [info.submask,info.cpus,info.hostname,info.release,info.version,info.ostype],
   }
 }
 
@@ -59,6 +66,7 @@ function createMovieTagLinksString(movieId,tagIds){
 
 }
 
+
 function createWatchHistoryItem(stats){
   const {subnet,movieid} = stats
   return {
@@ -66,17 +74,13 @@ function createWatchHistoryItem(stats){
     values: [subnet,movieid,Date.now()]
   }
 }
-
-function selectStatsOfAllPis(){
-  return `SELECT * FROM CLUSTER_STATS;`
-}
-
-function selectPiStatToUpdate(subnetid){
+function selectPiByHostname(hostname){
   return {
-    text: `SELECT * FROM CLUSTER_STATS WHERE subnet=$1`,
-    values: [subnetid]
+    text: `SELECT * FROM raspberrypis WHERE submask=$1`,
+    values: [hostname],
   }
 }
+
 
 /*
 select movie ideas that contain all these tags
@@ -142,6 +146,10 @@ function selectTagIdsWithMovieId(movieId){
 function readAllTags() {
     return `SELECT * FROM tags;`
 }
+function readStatsOfAllPis(){
+  return `SELECT * FROM CLUSTER_STATS;`
+}
+
 /* deprecated
 
 function readAllMovies() {
@@ -167,14 +175,8 @@ function readTaggedMoviesCount() {
   return `SELECT COUNT(*) FROM MoviesWithTag;`
 }
 
-
-function updatePiStatString(values){
-  return {
-    text: `UPDATE CLUSTER_STATS
-            SET uptime = $1, cpuload = $2 , osuptime = $3
-            WHERE condition;`,
-    values: [values['process-uptime'],values[load.join(",")],values['os-uptime']],
-  }
+function readAllPiesInfo() {
+  return `SELECT * FROM raspberrypis;`
 }
 
 function deleteTagFromAllTags(tag) {
@@ -186,20 +188,23 @@ function deleteTagFromAllTags(tag) {
 
 
 module.exports = {
+  createPiIdentityRecord,
+  createPiStatTimestampe,
+  selectPiByHostname,
+  createWatchHistoryItem,
+  readAllPiesInfo,
+
     createInsertMovieString,
     createMovieTagLinksString,
     createBulkTags,
-    createPiStatTimestampe,
     readAllTags,
     readTagCount,
     readMovieCount,
     readTaggedMoviesCount,
-    selectPiStatToUpdate,
-    selectStatsOfAllPis,
+    readStatsOfAllPis,
     selectMovieIdsWithTags,
     selectMoviesByManyIds,
     selectTagIdsWithMovieId,
-    updatePiStatString,
     deleteTagFromAllTags,
     filterMovieids,
 }
