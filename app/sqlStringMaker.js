@@ -3,7 +3,8 @@ const fs = require('fs');
 
 const {
   createInsertMovieString,
-  createMovieTagLinksString
+  createMovieTagLinksString,
+  createInsertTVString,
 } = require("./model/model")
 
 const {
@@ -26,12 +27,19 @@ function useClientToBulkInsert(client,filepath){
           duration: size,
           season
         });
-        let movieString = createInsertMovieString(movie);
+        let movieString;
+        if ( movie.season >=0 ){
+          movieString = createInsertMovieString(movie);
+        } else {
+          movieString = createInsertTVString(movie);
+        }
         if(movie.isInvalid || !movieString){
           console.log(movie,movieString);
+          return
         }
         if(movie.filename.length > 200 || movie.leecher.length > 30 || movie.epoch.length > 50 || movie.title.length > 256) {
           console.log(movie);
+          return
         }
         // console.log(movie);
         const {rows} = await client.query(movieString.text,movieString.values)

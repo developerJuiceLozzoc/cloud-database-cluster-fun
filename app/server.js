@@ -27,6 +27,7 @@ const { createBulkTags,
     selectMovieIdsWithTags,
     selectMoviesByManyIds,
     readTagCount,
+    readTVCount,
     readAllTags,
     readMovieCount,
     readTaggedMoviesCount,
@@ -153,19 +154,21 @@ app.listen(PORT,async function(){
     await pgclient.connect()
 
     /* insert */
-    // await pgclient.query(createPiStatsTable())
-    // await pgclient.query(createMoviesTable())
-    // await pgclient.query(createTagsRelationshipsTable())
-    // await pgclient.query(createPiStatsTable())
-    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
-    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
+    await pgclient.query(createTagsTable())
+    await pgclient.query(createMoviesTable())
+    await pgclient.query(createTvShowTable())
+    await pgclient.query(createTagsRelationshipsTable())
+    await pgclient.query(createBulkTags())
+    useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
+    useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
     /* end insert */
 
     /* read count */
     let tags = await pgclient.query(readTagCount())
     let movies = await pgclient.query(readMovieCount())
     let movietags = await pgclient.query(readTaggedMoviesCount())
-    console.log(tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
+    let tv = await pgclient.query(readTVCount())
+    console.log(tv,tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
     /*        */
     require("./helpers/clusterReporting")
     console.log("app is listening",PORT)

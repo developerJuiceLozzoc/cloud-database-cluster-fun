@@ -41,6 +41,12 @@ function createInsertMovieString(movie){
 		values: [movie.epoch,movie.year,movie.title,movie.episode,movie.leecher,movie.duration,movie.filename],
 	}
 }
+function createInsertTVString(movie){
+  return {
+    text: "INSERT INTO tvshows(epoch,year,title,season,episode,leecher,movie_size,filename) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
+    values: [movie.epoch,movie.year,movie.title,movie.season,movie.episode,movie.leecher,movie.duration,movie.filename],
+  }
+}
 
 function createPiStatTimestampe(stats){
   return {
@@ -164,7 +170,9 @@ SELECT
 FROM
    table_name
 */
-
+function readTVCount(){
+  return `SELECT COUNT(*) FROM tvshows;`
+}
 function readTagCount() {
     return `SELECT COUNT(*)  FROM tags;`
 }
@@ -193,7 +201,8 @@ module.exports = {
   selectPiByHostname,
   createWatchHistoryItem,
   readAllPiesInfo,
-
+  readTVCount,
+createInsertTVString,
     createInsertMovieString,
     createMovieTagLinksString,
     createBulkTags,

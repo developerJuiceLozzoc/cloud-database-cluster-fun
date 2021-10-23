@@ -36,7 +36,7 @@ let initialPing = {
 console.log(initialPing);
 axios({
   method: 'post',
-  url: `http://${ARCHAEIC_URL}:${PORT}/api/analytics/uptime`,
+  url: `http://${ARCHAEIC_URL}:${PORT}/api/pies/ping`,
   data: initialPing,
 })
 .then(function(){
@@ -48,16 +48,18 @@ axios({
 
 
 
-cron.schedule('*/5 * * * *', function(){
-
+cron.schedule('*/0.5 * * * *', function(){
+  let recent =  {
+    load: os.loadavg()[1],
+    submask: localip,
+    'process-uptime': process.uptime(),
+  }
+  console.log(recent);
   axios({
     method: 'post',
     url: `http://${ARCHAEIC_URL}:${PORT}/api/analytics/uptime`,
-    data: {
-      load: os.loadavg()[1],
-      submask: localip,
-      'process-uptime': process.uptime(),
-    }}
+    data: recent,
+  }
   )
   .then(function(){
     return

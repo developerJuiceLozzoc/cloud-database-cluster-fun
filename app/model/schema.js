@@ -111,6 +111,7 @@ class Movie {
 }
 
 module.exports = {
+  createTvShowTable,
   createPiStatsTable,
   createWatchHistoryTable,
   createPiIdentityTable,
