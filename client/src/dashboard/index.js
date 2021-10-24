@@ -60,25 +60,24 @@ const MiorrorNavBar = (props) => {
     <div className={TopLevelMirrorStyles}>
       <p>MIRRORS - Click differnt one if search results are slow</p>
       <div className={`${mirrorContainer} container`}>
+        <a href="http://localhost:3000">
         <button
           className={`btn play-pause ${host.includes('localhost:3000') ? selectedButtonStyle : unselectedButtonStyle}`}
-          onClick={function(){
-            window.location.href = 'http://localhost:3000';
-          }}
           key={'http://localhost:3000'}
           >
           <div className="icon-container">
           <p>Dev Mirror</p>
           </div>
         </button>
+        </a>
 
         {mirrors.map(function(url,index){
           console.log(url);
           return (
-            <button
-              onClick={function(){ window.location.href = `http://${url}` }}
+            <a href={`http://${url}`}
               key={url}
-              className="btn play-pause">
+              >
+            <button className="btn play-pause">
             {host.includes(url) && <button className="btn play-pause">
           		<div className={`icon-container ${selectedButtonStyle}`}>
           			<p>Selected</p>
@@ -90,7 +89,7 @@ const MiorrorNavBar = (props) => {
                 </button>
           		</div>}
               </button>
-            )
+              </a>)
         })}
     </div>
   </div>
