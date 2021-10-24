@@ -17,10 +17,9 @@ export function piselected_xor(currid,nextid){
 }
 const columns: GridColDef[] = [
   { field: "submask", headerName: "Subnet Mask", width: 150 },
-  { field: "osname", headerName: "OS", width: 200 },
-  { field: "cpuload", headerName: "Load(~5min)", width: 150 },
+  { field: "cpuload", headerName: "Load(~5min)", width: 200 },
   { field: "processuptime", headerName: "pUptime (Hours)", width: 200 },
-  { field: "date", headerName: "Date", width: 150 },
+  { field: "date", headerName: "Date", width: 200 },
 ];
 
 class RaspberryStatsView extends React.Component {
@@ -54,27 +53,28 @@ class RaspberryStatsView extends React.Component {
     width: 75px;
     border: 1px solid black;
     `;
+    const setSelectedPi = this.setSelectedPi;
     return (
       <Grid container spacing={2} sx={{ height: "90vh" }}>
         <Grid item xs={4}>
           <p> Click on a identity below to view its stats and information</p>
           <div className='mirror-container'>
-          {this.props.items.map(function(pi){
+          {this.props.names.map(function(pi){
             return <button
              className={selectedpi && selectedpi.submask === pi.submask ? selectedButtonStyles : unselectedButtonStyles }
              key={`infotainment-${pi.submask}`}
-             onClick={() => this.setSelectedPi(pi)}>
+             onClick={() => setSelectedPi(pi)}>
              {pi.submask}
             </button>
           })}
           </div>
           {/*Column*/}
-          {!!this.state.selectedpi && (
+          {!!selectedpi && (
             <div>
-              {Object.keys(this.state.selectedpi).map(function (key) {
+              {Object.keys(selectedpi).map(function (key) {
                 return (
                   <div key={`video: ${key}`}>
-                    <p>{this.state.selectedpi[key]}</p>
+                    <p>{selectedpi[key]}</p>
                   </div>
                 );
               })}

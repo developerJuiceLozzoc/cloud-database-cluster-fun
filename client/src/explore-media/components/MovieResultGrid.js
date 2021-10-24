@@ -18,7 +18,7 @@ const columns: GridColDef[] = [
 function MovieGrid(props) {
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <div style={{ height: "68%", width: '100%' }}>
       {props.items.length > 0 && <DataGrid
         rows={props.items}
         onSelectionModelChange={(newSelection) => {

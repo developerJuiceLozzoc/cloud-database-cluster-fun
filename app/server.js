@@ -17,7 +17,8 @@ const {createReadstreamForPath,
 
 const { createMoviesTable,
     createTagsTable,
-    createTagsRelationshipsTable,
+    createMovieTagsRelationshipsTable,
+    createTVTagsRelationshipsTable,
     createTvShowTable,
     Movie,
 } = require("./model/schema.js");
@@ -57,7 +58,6 @@ app.get("/api/pies/stats", async function(req,res){
   // res.redirect(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}${req.url}`)
   axios.get(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}/api/pies/stats`)
   .then(function(data){
-    console.log(data);
     res.status(200).send(data.data)
   })
   .catch(function(e){
@@ -69,7 +69,6 @@ app.get('/api/pies/names', async function(req,res){
   axios
   .get(`http://${ARCHAEIC_URL}:${COLLECTION_PORT}/api/pies/names`)
   .then(function(data){
-    console.log(data);
     res.status(200).send(data.data)
   })
   .catch(function(e){
@@ -117,25 +116,23 @@ app.get("/api/search/epoch", async function(req,res){
   res.end()
 });
 
-
 app.get("/api/search/movies", async function(req,res){
   const {andtags,ortags,type} = req.query;
+  console.log("req.query");
   try {
     const pgclient = new Client()
     await pgclient.connect()
     let tags = [];
+
     tags.push(andtags ? andtags.split(","):  [])
     tags.push(ortags ? ortags.split(","):  [])
 
-
-    let moviFilter = tags.flatMap((x)=>x)
-    console.log(moviFilter);
-    let tempresponse = await pgclient.query(selectMovieIdsWithTags(andtags,moviFilter.join(",")))
+    let tempresponse = await pgclient.query(selectMovieIdsWithTags(andtags,tags.flatMap((x)=>x).join(","),type))
     let ids = tempresponse.rows.map(function(item){
       return item.movieid
     })
     if(ids.length){
-      let temp2response = await pgclient.query(selectMoviesByManyIds(ids.join(",")))
+      let temp2response = await pgclient.query(selectMoviesByManyIds(ids.join(","),type))
       res.status(200).send(temp2response.rows)
     }else {
       res.status(200).send([])
@@ -145,6 +142,7 @@ app.get("/api/search/movies", async function(req,res){
   catch(e){
     console.log(e);
       res.status(400).send()
+      await pgclient.end();
   }
 })
 
@@ -154,28 +152,37 @@ app.listen(PORT,async function(){
     await pgclient.connect()
 
     /* insert */
-    await pgclient.query(createTagsTable())
-    await pgclient.query(createMoviesTable())
-    await pgclient.query(createTvShowTable())
-    await pgclient.query(createTagsRelationshipsTable())
-    await pgclient.query(createBulkTags())
-    useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
-    useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
+    // await pgclient.query(createTagsTable())
+    // await pgclient.query(createMoviesTable())
+    // await pgclient.query(createTvShowTable())
+    // await pgclient.query(createMovieTagsRelationshipsTable())
+    // await pgclient.query(createTVTagsRelationshipsTable())
+    // await pgclient.query(createBulkTags())
+    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
+    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
     /* end insert */
 
     /* read count */
     let tags = await pgclient.query(readTagCount())
     let movies = await pgclient.query(readMovieCount())
     let movietags = await pgclient.query(readTaggedMoviesCount())
+    let tvtags = await pgclient.query("SELECT COUNT(*) FROM TvShowsWithTag;")
     let tv = await pgclient.query(readTVCount())
-    console.log(tv,tags.rows[0].count,movies.rows[0].count,movietags.rows[0].count);
+
+    let tagnames = await pgclient.query(readAllTags());
+    console.log(tagnames.rows)
+
+    console.log(`Tagged Items: Tags on movies: ${movietags.rows[0].count}, tag on shows: ${tvtags.rows[0].count}`);
+    console.log(movies.rows[0].count,tv.rows[0].count,tags.rows[0].count,);
     /*        */
+
     require("./helpers/clusterReporting")
     console.log("app is listening",PORT)
+    await pgclient.end()
   }
   catch(e){
     console.log(e);
-      // await pgclient.end()
+      await pgclient.end()
   }
 
 })

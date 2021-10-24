@@ -43,7 +43,7 @@ function createInsertMovieString(movie){
 }
 function createInsertTVString(movie){
   return {
-    text: "INSERT INTO tvshows(epoch,year,title,season,episode,leecher,movie_size,filename) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
+    text: "INSERT INTO tvshows(epoch,year,title,season,episode,leecher,movie_size,filename) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING movieId,title;",
     values: [movie.epoch,movie.year,movie.title,movie.season,movie.episode,movie.leecher,movie.duration,movie.filename],
   }
 }
@@ -72,7 +72,15 @@ function createMovieTagLinksString(movieId,tagIds){
 
 }
 
+function createTVShowTagLinksString(movieId,tagIds){
+  return tagIds.map(function(tag){
+    return {
+        text: `INSERT INTO TvShowsWithTag (tagId,movieId) values ($1,$2)`,
+        values: [tag,movieId]
+    }
+  })
 
+}
 function createWatchHistoryItem(stats){
   const {subnet,movieid} = stats
   return {
@@ -92,10 +100,9 @@ function selectPiByHostname(hostname){
 select movie ideas that contain all these tags
 
 */
-function selectMovieIdsWithTags(andtags = [],tags){
-  console.log(tags);
+function selectMovieIdsWithTags(andtags = [],tags,type){
     return `select movieId
-        from MoviesWithTag
+        from ${type === 'movie' ? 'MoviesWithTag' : 'TvShowsWithTag'}
         where tagId in (${tags})
         group by movieId
         ${andtags.length > 0 ? `having array_agg(tagId) @> array[${andtags}];` : ';'}`;
@@ -138,9 +145,10 @@ function filterMovieids(movies,filter){
   return items
 }
 
-function selectMoviesByManyIds(movieids){
-  console.log(`Movies in this amaount :${movieids}:`);
-  return `SELECT * FROM movies WHERE movieId IN (${movieids})`;
+function selectMoviesByManyIds(movieids,type){
+  return `SELECT *
+  FROM ${type === 'movie' ? 'movies' : 'tvshows'}
+   WHERE movieId IN (${movieids})`;
 }
 
 function selectTagIdsWithMovieId(movieId){
@@ -200,9 +208,10 @@ module.exports = {
   createPiStatTimestampe,
   selectPiByHostname,
   createWatchHistoryItem,
+  createTVShowTagLinksString,
   readAllPiesInfo,
   readTVCount,
-createInsertTVString,
+  createInsertTVString,
     createInsertMovieString,
     createMovieTagLinksString,
     createBulkTags,

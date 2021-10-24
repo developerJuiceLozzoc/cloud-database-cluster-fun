@@ -58,7 +58,7 @@ const MiorrorNavBar = (props) => {
 
   return (
     <div className={TopLevelMirrorStyles}>
-      <p>MIRRORS - Click if search results are slow</p>
+      <p>MIRRORS - Click differnt one if search results are slow</p>
       <div className={`${mirrorContainer} container`}>
         <button
           className={`btn play-pause ${host.includes('localhost:3000') ? selectedButtonStyle : unselectedButtonStyle}`}
@@ -119,7 +119,7 @@ class Dashboard extends React.Component {
   render(){
     return (
       <Router history={this.state.history}>
-      <div style={{height:"100%"}}>
+      <div style={{height:"100vh"}}>
       {/*row  bottom /inset top inset?*/}
       <MiorrorNavBar />
       <Navbar />
@@ -130,15 +130,13 @@ class Dashboard extends React.Component {
       </Route>
 
       <Route path="/movies">
-        <Grid container spacing={2} sx={{ height: '85%' }}>
+        <Grid container spacing={2} sx={{ height: "90vh" }}>
           <Grid item xs={4}>
               {/*Column*/}<PlainHtml5Viewr />
+              {/*explore the current epoch selecte and related items, if none there than suggest random items*/}<p>view History coming soon</p>
           </Grid>
           <Grid item xs={8}>
             {/*browse menu, to find other files */}<MovieSearchCard />
-          </Grid>
-          <Grid item xs={12}>
-            {/*explore the current epoch selecte and related items, if none there than suggest random items*/}
           </Grid>
         </Grid>
       </Route>
@@ -172,7 +170,7 @@ class Dashboard extends React.Component {
     fetch('/api/pies/names')
     .then(res => res.json())
     .then(function(data){
-      self.props.setPiNames(data)
+      self.props.setPiNamesAction(data)
     })
     .catch(function(e){
       console.log(e);

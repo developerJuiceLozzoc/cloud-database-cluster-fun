@@ -4,12 +4,16 @@ const fs = require('fs');
 const {
   createInsertMovieString,
   createMovieTagLinksString,
+  createTVShowTagLinksString,
   createInsertTVString,
 } = require("./model/model")
 
 const {
   Movie
 } = require('./model/schema')
+
+let tvTags = 0
+let movieTags = 0;
 
 
 function useClientToBulkInsert(client,filepath){
@@ -18,7 +22,7 @@ function useClientToBulkInsert(client,filepath){
     .pipe(csv())
     .on('data', async (row) => {
       const {tags, epoch,year,title,season, episode,leecher,size,path} = row;
-
+      
       try {
         let movie = new Movie({
           epoch,title,year,episode,year,
@@ -28,11 +32,13 @@ function useClientToBulkInsert(client,filepath){
           season
         });
         let movieString;
-        if ( movie.season >=0 ){
-          movieString = createInsertMovieString(movie);
-        } else {
+        if ( movie.season > 0 ){
           movieString = createInsertTVString(movie);
+        } else {
+          movieString = createInsertMovieString(movie);
         }
+
+
         if(movie.isInvalid || !movieString){
           console.log(movie,movieString);
           return
@@ -41,14 +47,21 @@ function useClientToBulkInsert(client,filepath){
           console.log(movie);
           return
         }
-        // console.log(movie);
+
+
         const {rows} = await client.query(movieString.text,movieString.values)
+
         if(rows.length > 0 ){
           let movieID= rows[0].movieid;
-          createMovieTagLinksString(movieID,tags.split(" ")).forEach(async function(query){
-            let result = await client.query(query.text,query.values)
-            // console.log(result);
-          })
+          if(movie.season > 0){
+            createTVShowTagLinksString(movieID,tags.split(" ")).forEach(async function(query){
+              await client.query(query.text,query.values)
+            })
+          } else {
+            createMovieTagLinksString(movieID,tags.split(" ")).forEach(async function(query){
+              await client.query(query.text,query.values)
+            })
+          }
         }
 
       } catch(e){

@@ -37,6 +37,8 @@ function TagSearchView(props){
     if(query.ortags.length > 0 ){
       querystuff.ortags = query.ortags.join(",")
     }
+    querystuff.type = query.type
+
     if(query.ortags.length > 0 || query.andtags.length > 0 ){
       axios.get(`/api/search/movies?${queryString.stringify(querystuff)}`)
       .then(function(res){
@@ -63,22 +65,27 @@ function TagSearchView(props){
 
   return (<>
     <p> Red means AND, Green means OR</p>
-    <div
-
-   >
-    {tags.length > 0 && TagButtons }
-   </div>
+    <div>
+      {tags.length > 0 && TagButtons }
+    </div>
     <Button
       varient="contained"
       color="success"
       onClick={function(){
+        const tagIdsSelectedArr = Object.keys(checked).filter(function(key){
+          return checked[key] > 0
+        })
+
+        if(tagIdsSelectedArr.includes("1") && tagIdsSelectedArr.includes("25")){
+          alert("You cannot fetch results for movies and tvs at the same time it would suck :P")
+          return
+        }
       let query = {
         andtags: [],
         ortags: [],
+        type: tagIdsSelectedArr.includes("1") ? "movie" : "tvshow",
       }
-      Object.keys(checked).filter(function(key){
-        return checked[key] > 0
-      }).forEach(function(key){
+      tagIdsSelectedArr.forEach(function(key){
         switch(checked[key]){
           case 1:
             query.ortags.push(key)

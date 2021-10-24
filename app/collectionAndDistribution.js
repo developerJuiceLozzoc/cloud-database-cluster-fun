@@ -120,7 +120,6 @@ app.listen(PORT,async function(){
     const pgclient = new Client()
     await pgclient.connect()
     /* insert */
-    // await pgclient.query(createPiIdentityTable());
     await pgclient.query(createPiStatsTable());
     /*        */
 

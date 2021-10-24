@@ -65,9 +65,16 @@ function createTagsTable() {
 
 
 
-function createTagsRelationshipsTable() {
+function createMovieTagsRelationshipsTable() {
     return `DROP TABLE IF EXISTS MoviesWithTag;
     CREATE TABLE MoviesWithTag (
+    tagId int,
+    movieId int)`;
+}
+
+function createTVTagsRelationshipsTable() {
+    return `DROP TABLE IF EXISTS TvShowsWithTag;
+    CREATE TABLE TvshowsWithTag (
     tagId int,
     movieId int)`;
 }
@@ -117,6 +124,7 @@ module.exports = {
   createPiIdentityTable,
     createMoviesTable,
     createTagsTable,
-    createTagsRelationshipsTable,
+    createMovieTagsRelationshipsTable,
+    createTVTagsRelationshipsTable,
     Movie
 }
