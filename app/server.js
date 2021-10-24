@@ -41,7 +41,7 @@ const { createBulkTags,
 const {useClientToBulkInsert} = require("./sqlStringMaker.js")
 
 
-app.use(express.static("../client/build"))
+app.use(express.static("/react/build"))
 app.use(bp.json())
 
 
