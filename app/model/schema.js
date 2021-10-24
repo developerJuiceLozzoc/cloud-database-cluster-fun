@@ -30,11 +30,20 @@ function createPiStatsTable(){
   CREATE TABLE CLUSTER_STATS (
     submask varchar(16) NOT NULL,
     cpuload varchar(16) NOT NULL,
-    osuptime bigint,
-    processuptime bigint,
-    osname varchar(16),
-    cpus  varchar(256),
+    processuptime bigint NOT NULL,
     date bigint NOT NULL
+  );`
+}
+function createPiIdentityTable(){
+  return `DROP TABLE IF EXISTS raspberrypis;
+  CREATE TABLE raspberrypis (
+    submask varchar(16) NOT NULL PRIMARY KEY,
+    cpus  varchar(256),
+    hostname varchar(128),
+    release varchar(255),
+    version varchar(255),
+    ostype varchar(64),
+    arch varchar(32),
   );`
 }
 
@@ -56,9 +65,16 @@ function createTagsTable() {
 
 
 
-function createTagsRelationshipsTable() {
+function createMovieTagsRelationshipsTable() {
     return `DROP TABLE IF EXISTS MoviesWithTag;
     CREATE TABLE MoviesWithTag (
+    tagId int,
+    movieId int)`;
+}
+
+function createTVTagsRelationshipsTable() {
+    return `DROP TABLE IF EXISTS TvShowsWithTag;
+    CREATE TABLE TvshowsWithTag (
     tagId int,
     movieId int)`;
 }
@@ -102,10 +118,13 @@ class Movie {
 }
 
 module.exports = {
+  createTvShowTable,
   createPiStatsTable,
   createWatchHistoryTable,
+  createPiIdentityTable,
     createMoviesTable,
     createTagsTable,
-    createTagsRelationshipsTable,
+    createMovieTagsRelationshipsTable,
+    createTVTagsRelationshipsTable,
     Movie
 }

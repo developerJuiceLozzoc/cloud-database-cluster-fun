@@ -7,48 +7,59 @@ const PORT = process.env.COLLECTION_PORT
 const AUTH_TOKEN = 'bearer'
 const localip  = foobar("http","0.0.0.0",PORT).lanUrlForTerminal;
 console.log(foobar("http","0.0.0.0",PORT));
-console.log({
-  cpus: [],
-  'osName': `${os.type()}/${os.platform()}`,
-  load: os.loadavg()[1],
-  submask: localip,
-  'process-uptime': process.uptime(),
-  'os-uptime': require('os').uptime(),
-});
+
 
 
 axios.defaults.headers.common['Authorization'] = `Bearer ${AUTH_TOKEN}`;
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+let cpus = {}
+os.cpus().forEach(function(cpu){
+  if( cpus[`${cpu.model}`] ){
+      cpus[`${cpu.model}`].count += 1;
+  }
+  else{
+     cpus[`${cpu.model}`] = {
+       count: 1,
+       speed: `${cpu.speed} Mhz`,
+     }
+  }
+})
+let initialPing = {
+    cpus: JSON.stringify(cpus),
+    arch: os.arch(),
+    submask: localip,
+    hostname: os.hostname(),
+    release: os.release(),
+    version: os.version(),
+    ostype: os.type(),
+}
+console.log(initialPing);
+axios({
+  method: 'post',
+  url: `http://${ARCHAEIC_URL}:${PORT}/api/pies/ping`,
+  data: initialPing,
+})
+.then(function(){
+  console.log("ssad;ifj");
+})
+.catch(function(e){
+  console.log('connection failed to arhcaeic server');
+})
 
-console.log("NODE SPINNING UP");
 
 
-
-cron.schedule('*/1 * * * *', function(){
-  console.log("FIRING ANALYTICS");
-  let cpus = {}
-  os.cpus().forEach(function(cpu){
-    if( cpus[`${cpu.model}`] ){
-        cpus[`${cpu.model}`].count += 1;
-    }
-    else{
-       cpus[`${cpu.model}`] = {
-         count: 1,
-         speed: `${cpu.speed} Mhz`,
-       }
-    }
-  })
+cron.schedule('*/0.5 * * * *', function(){
+  let recent =  {
+    load: os.loadavg()[1],
+    submask: localip,
+    'process-uptime': process.uptime(),
+  }
+  console.log(recent);
   axios({
     method: 'post',
-    url: `http://${ARCHAEIC_URL}:${PORT}/analytics/uptime`,
-    data: {
-      cpus,
-      'osName': `${os.type()}/${os.hostname()}`,
-      load: os.loadavg()[1],
-      submask: localip,
-      'process-uptime': process.uptime(),
-      'os-uptime': require('os').uptime(),
-    }}
+    url: `http://${ARCHAEIC_URL}:${PORT}/api/analytics/uptime`,
+    data: recent,
+  }
   )
   .then(function(){
     return

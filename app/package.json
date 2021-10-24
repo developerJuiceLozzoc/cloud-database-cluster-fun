@@ -15,12 +15,8 @@
     "csv-parser": "^3.0.0",
     "csv-reader": "^1.0.8",
     "express": "^4.17.1",
-    "mongoose": "^6.0.8",
     "node-cron": "^3.0.0",
-    "pg": "^8.7.1",
-    "postgres": "^1.0.2",
-    "ssh2": "^1.4.0",
-    "ssh2-streams": "^0.4.10"
+    "pg": "^8.7.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.13"

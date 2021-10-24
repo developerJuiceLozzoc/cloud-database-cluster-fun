@@ -4,11 +4,19 @@ const app = express()
 const PORT = process.env.COLLECTION_PORT || 4000;
 const {Client} = require("pg");
 const bp = require('body-parser')
+
 const {
-createPiStatTimestampe,
+  createPiStatTimestampe,
+  createPiIdentityRecord,
+  selectPiByHostname,
+  createWatchHistoryItem,
+  readAllPiesInfo,
+  readStatsOfAllPis
 } = require("./model/model.js")
 const {
   createPiStatsTable,
+  createPiIdentityTable,
+  createWatchHistoryTable,
 } = require("./model/schema.js");
 
 /* Enviroment
@@ -20,56 +28,89 @@ PORT=
 app.use(bp.json())
 
 
-app.post('/analytics/uptime', async function(req,res){
+app.post('/api/analytics/uptime', async function(req,res){
   let info = req.body
   try {
     const pgclient = new Client()
     await pgclient.connect()
-
     console.log(`Ip address from Express: ${req.ip}`);
-    console.log(`Local SubnetMask: ${info.submask}`);
-
     let query1 = createPiStatTimestampe(info)
-    let getresponce = await pgclient.query(query1.text,query1.values)
-
+    let tempresponce = await pgclient.query(query1.text,query1.values)
     await pgclient.end()
     res.status(201).end()
-
   }
   catch(e){
     console.log(e);
     res.status(300).end()
   }
 })
+app.post('/api/pies/ping', async function(req,res){
+  const pi = req.body
+  const pgclient = new Client()
+  try {
+    await pgclient.connect()
+    res.status(201).end()
+    let tempresponse1 = await pgclient.query(selectPiByHostname(pi.submask))
+    if(tempresponse1.rows.length === 0) {
+      let tempresponse2 = await pgclient.query(createPiIdentityRecord(req.body));
+      await pgclient.end()
+      return;
+    }
+    await pgclient.end()
+  } catch (e) {
+    console.log(e);
+    res.status(500).end()
+    await pgclient.end()
+  }
+})
+app.get('/api/pies/names', async function(req,res){
+  try {
+    const pgclient = new Client()
+    await pgclient.connect()
+    let  temprespojnse = await pgclient.query(readAllPiesInfo())
+    await pgclient.end()
+    res.status(200).send(temprespojnse.rows)
+  } catch (e) {
+    console.log("errror",e);
+    res.status(500).end()
+  }
+});
+app.get("/api/pies/stats", async function(req,res){
+  try {
+    const pgclient = new Client()
+    await pgclient.connect()
+    let  temprespojnse = await pgclient.query(readStatsOfAllPis())
+    await pgclient.end()
+    res.status(200).send(temprespojnse.rows)
+  } catch (e) {
+    res.status(500).end()
+  }
+});
+
 
 app.get('/stream', async function(req,res){
   const {path,size} = req.query;
   const range = req.headers.range;
-  const videoSize = size;
-  // get video stats (about 61MB)
-  const videoPath = path;
-  // const videoSize = fs.statSync(videoPath).size;
   const CHUNK_SIZE = (10 ** 6) * 2; // 1MB
-  console.log(path,size);
+  // console.log(path,size);
 
-    const start = Number(range.replace(/\D/g, ""));
-    const end = Math.min(start + CHUNK_SIZE, videoSize - 1);
-    const contentLength = end - start + 1;
-    const headers = {
-      "Content-Range": `bytes ${start}-${end}/${videoSize}`,
-      "Content-Length": contentLength,
-      "Accept-Ranges": "bytes",
-    };
-
-
-    try{
-      res.writeHead(206, headers);
-      const videoStream = fs.createReadStream(videoPath, { start, end });
-      videoStream.pipe(res)
-    }
-    catch(e){
-      res.status(500).send(e)
-    }
+  const start = Number(range.replace(/\D/g, ""));
+  const end = Math.min(start + CHUNK_SIZE, size - 1);
+  const contentLength = end - start + 1;
+  const headers = {
+    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+    "Content-Length": contentLength,
+    "Accept-Ranges": "bytes",
+  };
+  try{
+    res.writeHead(206, headers);
+    fs
+    .createReadStream(videoPath, { start, end })
+    .pipe(res);
+  }
+  catch(e){
+    res.status(500).send(e)
+  }
 
 
 })
@@ -79,8 +120,11 @@ app.listen(PORT,async function(){
     const pgclient = new Client()
     await pgclient.connect()
     /* insert */
-    //await pgclient.query(createPiStatsTable())
+    await pgclient.query(createPiStatsTable());
+    /*        */
+
     await pgclient.end()
+    require('./helpers/clusterReporting.js')
     console.log("app is listening",PORT)
   }
   catch(e){

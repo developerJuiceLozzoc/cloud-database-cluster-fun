@@ -6,17 +6,16 @@ import {Restore} from '@mui/icons-material'
 import ExploreIcon from '@mui/icons-material/Explore';
 import {
   BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import MovieSearchCard from "./components/MovieSearchCard"
 import PlainHtml5Viewr from "./components/PlainHtml5Viewr"
 import RaspberryStatsView from "./components/RaspberryStatsView"
-import {setTagsAction,setPiHistoryAction} from "../actions"
-import { css, cx } from '@emotion/css'
-
+import {setTagsAction,setPiHistoryAction,setPiNamesAction} from "../actions"
+import { css } from '@emotion/css'
+import TopLevelMirrorStyles from "./style/mirror.js"
+import {mirrors} from "../reducers"
 const Navbar = props => {
   let history = useHistory();
 
@@ -40,27 +39,62 @@ const Navbar = props => {
 }
 
 const MiorrorNavBar = (props) => {
+  const host = window.location.host;
   const mirrorContainer=css`
-  display: flex;
-  flex-wrap: no-wrap;
-  flex-direction: row;
+    display: flex;
+    flex-wrap: no-wrap;
+    flex-direction: row;
   `;
-  let mirrors = ["http://10.0.0.114","http://10.0.0.92","http://10.0.0.237"]
+  const selectedButtonStyle = css`
+    color: green;
+  `;
+  const unselectedButtonStyle = css`
+  border-color: #121212;
+  background: 'white';
+  `;
+
+  // const mirrorButtonSelectedStyle=css`
+  // `;
 
   return (
-    <div>
-    <p>MIRRORS</p>
-    <div className={mirrorContainer}>
-    {mirrors.map(function(url,index){
-      return <button onClick={function(){
-        window.location.href = url;
-      }}
-      key={url}
-      >
-      Mirror {index+1}</button>
-    })}
+    <div className={TopLevelMirrorStyles}>
+      <p>MIRRORS - Click differnt one if search results are slow</p>
+      <div className={`${mirrorContainer} container`}>
+        <button
+          className={`btn play-pause ${host.includes('localhost:3000') ? selectedButtonStyle : unselectedButtonStyle}`}
+          onClick={function(){
+            window.location.href = 'http://localhost:3000';
+          }}
+          key={'http://localhost:3000'}
+          >
+          <div className="icon-container">
+          <p>Dev Mirror</p>
+          </div>
+        </button>
+
+        {mirrors.map(function(url,index){
+          console.log(url);
+          return (
+            <button
+              onClick={function(){ window.location.href = `http://${url}` }}
+              key={url}
+              className="btn play-pause">
+            {host.includes(url) && <button className="btn play-pause">
+          		<div className={`icon-container ${selectedButtonStyle}`}>
+          			<p>Selected</p>
+          		</div>
+            </button>}
+          	{!host.includes(url)	&& <div className={`icon-container ${unselectedButtonStyle}`}>
+                <button>
+                  Mirror {index+1}
+                </button>
+          		</div>}
+              </button>
+            )
+        })}
     </div>
-</div>)
+  </div>
+  )
 }
 
 class Dashboard extends React.Component {
@@ -85,7 +119,7 @@ class Dashboard extends React.Component {
   render(){
     return (
       <Router history={this.state.history}>
-      <div style={{height:"100%"}}>
+      <div style={{height:"100vh"}}>
       {/*row  bottom /inset top inset?*/}
       <MiorrorNavBar />
       <Navbar />
@@ -96,15 +130,13 @@ class Dashboard extends React.Component {
       </Route>
 
       <Route path="/movies">
-        <Grid container spacing={2} sx={{ height: '85%' }}>
+        <Grid container spacing={2} sx={{ height: "90vh" }}>
           <Grid item xs={4}>
-              {/*Column*/}<PlainHtml5Viewr url="/stream/asdf" />
+              {/*Column*/}<PlainHtml5Viewr />
+              {/*explore the current epoch selecte and related items, if none there than suggest random items*/}<p>view History coming soon</p>
           </Grid>
           <Grid item xs={8}>
             {/*browse menu, to find other files */}<MovieSearchCard />
-          </Grid>
-          <Grid item xs={12}>
-            <p>xs=4</p>  {/*explore the current epoch selecte and related items, if none there than suggest random items*/}
           </Grid>
         </Grid>
       </Route>
@@ -123,14 +155,22 @@ class Dashboard extends React.Component {
 
   }
   handleLoadUserHistory(){
-    const userRecentItems = sessionStorage.getItem("Watch History")
+    // const userRecentItems = sessionStorage.getItem("Watch History")
   }
   handleLoadPiHistory(){
     const self = this;
-    fetch('/api/getAllPiStats')
+    fetch('/api/pies/stats')
     .then(res => res.json())
     .then(function(data){
       self.props.setPiHistory(data)
+    })
+    .catch(function(e){
+      console.log(e);
+    })
+    fetch('/api/pies/names')
+    .then(res => res.json())
+    .then(function(data){
+      self.props.setPiNamesAction(data)
     })
     .catch(function(e){
       console.log(e);
@@ -154,6 +194,7 @@ function mapDispatchToProps(dispatch){
     setPiHistory: (history) => dispatch(setPiHistoryAction(history)),
     setTags: (tags) => dispatch(setTagsAction(tags)),
     setRelatedContent: (key,content) => dispatch({type:"RELATEDCONTENT"}),
+    setPiNamesAction: (stuff) => dispatch(setPiNamesAction(stuff))
   }
 }
 

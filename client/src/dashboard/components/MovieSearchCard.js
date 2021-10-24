@@ -1,25 +1,22 @@
 import React, {useState} from 'react'
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {connect} from "react-redux"
 
-import {BottomNavigation,BottomNavigationAction, Card,
-FormControl,FormControlLabel} from '@mui/material';
+import {BottomNavigation,BottomNavigationAction, Card} from '@mui/material';
 
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
-import StarIcon from '@mui/icons-material/Star';
-import ListItem from '@mui/material/ListItem';
 
 
 
-import {setCurrentSearchResultTypeAction,setSearchResults} from "../../actions"
+import {setCurrentSearchResultTypeAction} from "../../actions"
 import TagSearchView from "../../explore-media/components/TagSearch"
 import MovieSearchResults from "../../explore-media/components/MovieResultGrid"
 
 function MovieSearchTabRouter(props){
-  const {route,tags} = props
+  const {route} = props;
   switch(route){
     case 0:
       return (<TagSearchView />)

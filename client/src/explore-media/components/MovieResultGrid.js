@@ -1,11 +1,9 @@
 import React from 'react'
 import {connect} from "react-redux"
-import { DataGrid, GridRowsProp, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {
-  CurrentSelectedMovieSelector,
   CurrentSearchResultsTypeSelector,
   SearchResultsSelector} from "../../reducers/selectors"
-import {Button} from '@mui/material';
 import {didSelectMovieAction} from "../../actions/index.js"
 
 const columns: GridColDef[] = [
@@ -20,7 +18,7 @@ const columns: GridColDef[] = [
 function MovieGrid(props) {
 
   return (
-    <div style={{ height: 400, width: '100%' }}>
+    <div style={{ height: "68%", width: '100%' }}>
       {props.items.length > 0 && <DataGrid
         rows={props.items}
         onSelectionModelChange={(newSelection) => {
@@ -33,7 +31,8 @@ function MovieGrid(props) {
     </div>
   );
 }
-//
+
+
 function mapStateToProps(state){
   const type =  CurrentSearchResultsTypeSelector(state,SearchResultsSelector(state));
   return {
