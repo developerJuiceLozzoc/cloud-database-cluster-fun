@@ -7,6 +7,8 @@ const PORT = process.env.COLLECTION_PORT
 const AUTH_TOKEN = 'bearer'
 const localip  = foobar("http","0.0.0.0",PORT).lanUrlForTerminal;
 console.log(foobar("http","0.0.0.0",PORT));
+const ip = process.env.ANALYTICS;
+
 
 
 
@@ -27,7 +29,7 @@ os.cpus().forEach(function(cpu){
 let initialPing = {
     cpus: JSON.stringify(cpus),
     arch: os.arch(),
-    submask: localip,
+    submask: ip,
     hostname: os.hostname(),
     release: os.release(),
     version: os.version(),
@@ -51,7 +53,7 @@ axios({
 cron.schedule('*/0.5 * * * *', function(){
   let recent =  {
     load: os.loadavg()[1],
-    submask: localip,
+    submask: ip,
     'process-uptime': process.uptime(),
   }
   console.log(recent);
