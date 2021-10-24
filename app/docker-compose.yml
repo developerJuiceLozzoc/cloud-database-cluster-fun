@@ -26,6 +26,8 @@ services:
    restart: always
    env_file: ../.env
    ports:
-    - 4444:4444
+    - 80:80
+   volumes:
+    - ../client/build:/react/build
 volumes:
  mysql-data:
