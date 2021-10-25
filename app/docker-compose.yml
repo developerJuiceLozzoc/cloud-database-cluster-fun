@@ -26,8 +26,8 @@ services:
    restart: always
    env_file: ../.env
    ports:
-    - 80:80
+    - 4444:4444
    volumes:
-    - ../client/build:/react/build
+    - /run/media/pi/My Passport/videos:/run/media/pi/My Passport/videos
 volumes:
  mysql-data:

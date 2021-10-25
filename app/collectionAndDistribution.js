@@ -50,8 +50,10 @@ app.post('/api/pies/ping', async function(req,res){
   try {
     await pgclient.connect()
     res.status(201).end()
+    console.log("ping 1");
     let tempresponse1 = await pgclient.query(selectPiByHostname(pi.submask))
     if(tempresponse1.rows.length === 0) {
+	console.log('ping 2')
       let tempresponse2 = await pgclient.query(createPiIdentityRecord(req.body));
       await pgclient.end()
       return;
@@ -67,6 +69,7 @@ app.get('/api/pies/names', async function(req,res){
   try {
     const pgclient = new Client()
     await pgclient.connect()
+	console.log('ping 4')
     let  temprespojnse = await pgclient.query(readAllPiesInfo())
     await pgclient.end()
     res.status(200).send(temprespojnse.rows)
@@ -92,27 +95,23 @@ app.get('/stream', async function(req,res){
   const {path,size} = req.query;
   const range = req.headers.range;
   const CHUNK_SIZE = (10 ** 6) * 2; // 1MB
-  // console.log(path,size);
-
   const start = Number(range.replace(/\D/g, ""));
   const end = Math.min(start + CHUNK_SIZE, size - 1);
   const contentLength = end - start + 1;
   const headers = {
-    "Content-Range": `bytes ${start}-${end}/${videoSize}`,
+    "Content-Range": `bytes ${start}-${end}/${size}`,
     "Content-Length": contentLength,
     "Accept-Ranges": "bytes",
   };
   try{
     res.writeHead(206, headers);
     fs
-    .createReadStream(videoPath, { start, end })
+    .createReadStream(path, { start, end })
     .pipe(res);
   }
   catch(e){
     res.status(500).send(e)
   }
-
-
 })
 
 app.listen(PORT,async function(){
@@ -121,7 +120,8 @@ app.listen(PORT,async function(){
     await pgclient.connect()
     /* insert */
     await pgclient.query(createPiStatsTable());
-    /*        */
+    //await pgclient.query(createPiIdentityTable());
+   /*        */
 
     await pgclient.end()
     require('./helpers/clusterReporting.js')
@@ -132,3 +132,4 @@ app.listen(PORT,async function(){
   }
 
 })
+

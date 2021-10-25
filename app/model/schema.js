@@ -43,7 +43,7 @@ function createPiIdentityTable(){
     release varchar(255),
     version varchar(255),
     ostype varchar(64),
-    arch varchar(32),
+    arch varchar(32)
   );`
 }
 

@@ -50,7 +50,7 @@ axios({
 
 
 
-cron.schedule('*/0.5 * * * *', function(){
+cron.schedule('*/5 * * * *', function(){
   let recent =  {
     load: os.loadavg()[1],
     submask: ip,
