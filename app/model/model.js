@@ -1,4 +1,4 @@
-const {Movie} = require("./schema")
+const {Movie,NodejsServerIdentity} = require("./schema")
 
 
 function createBulkTags() {
@@ -56,10 +56,15 @@ function createPiStatTimestampe(stats){
 }
 
 function createPiIdentityRecord(info){
-  return {
-    text: `INSERT INTO raspberrypis(submask,cpus,hostname,release,version,ostype) VALUES($1,$2,$3,$4,$5,$6)`,
-    values: [info.submask,info.cpus,info.hostname,info.release,info.version,info.ostype],
+  if(info.constructor.name == "NodejsServerIdentity" && !info.invalid){
+    return {
+      text: `INSERT INTO raspberrypis(submask,cpus,hostname,release,version,ostype,arch) VALUES($1,$2,$3,$4,$5,$6,$7)`,
+      values: [info.submask,info.cpus,info.hostname,info.release,info.version,info.ostype,info.arch],
+    }
+  } else {
+    return null;
   }
+
 }
 
 function createMovieTagLinksString(movieId,tagIds){

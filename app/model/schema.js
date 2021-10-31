@@ -84,6 +84,30 @@ function createTVTagsRelationshipsTable() {
  availibe tags and their frequency used hitlist
  */
 
+
+
+ class NodejsServerIdentity {
+   constructor(data) {
+     ["submask", "cpus", "hostname", "release", "version", "ostype", "arch"]
+     .forEach((name) => {
+       if(!data[name]){
+         this.invalid = true;
+       }
+     })
+     if(this.invalid){
+       return
+     }
+     const {submask, cpus, hostname, release, version, ostype, arch} = data;
+     this.submask = submask
+     this.cpus = cpus;
+     this.hostname = hostnmae;
+     this.release = release;
+     this.version = version;
+     this.ostype = ostype;
+     this.arch = arch;
+   }
+ }
+
 /*
  epoch: a reoccuring substring that links together other strings.
         Some movies will intersect upon the same epoch.
@@ -126,5 +150,6 @@ module.exports = {
     createTagsTable,
     createMovieTagsRelationshipsTable,
     createTVTagsRelationshipsTable,
-    Movie
+    Movie,
+    NodejsServerIdentity,
 }

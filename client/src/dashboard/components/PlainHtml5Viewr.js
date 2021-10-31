@@ -17,7 +17,7 @@ function PlainHtml5Viewr(props){
   //.replace("/home/pi/Videos/","/home/pi/Desktop/My Passport/videos/")
   let query =  !!props.selectedvideo ? queryString.stringify({
     size: props.selectedvideo.movie_size,
-    path: props.selectedvideo.filename.replace("/home/pi/Videos/","/run/media/pi/My Passport/videos/"),
+    path: props.selectedvideo.filename.replace("/home/pi/Videos/","/media/"),
   }) : null;
 
   if(!!props.selectedvideo){
@@ -34,8 +34,7 @@ function PlainHtml5Viewr(props){
       }
       {!!props.selectedvideo && isWatching && <div>
         <video controls width="100%">
-        <source src={`http://10.0.0.227:4444/stream?${query}`}
-                type="video/mp4" />
+        <source src={`http://10.0.0.227:4444/stream?${query}`} />
         Sorry, your browser doesn't support embedded videos.
         </video>
         <button onClick={function(){ toggleIsWatching(false)}}>StopWatching</button>

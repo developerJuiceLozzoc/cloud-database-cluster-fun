@@ -50,11 +50,12 @@ app.post('/api/pies/ping', async function(req,res){
   try {
     await pgclient.connect()
     res.status(201).end()
-    console.log("ping 1");
     let tempresponse1 = await pgclient.query(selectPiByHostname(pi.submask))
     if(tempresponse1.rows.length === 0) {
-	console.log('ping 2')
-      let tempresponse2 = await pgclient.query(createPiIdentityRecord(req.body));
+      const expressinstance = new NodejsServerIdentity(req.body)
+      console.log(expressinstance);
+      let query = createPiIdentityRecord(expressinstance);
+      let tempresponse2 = await pgclient.query(query.text,query.values);
       await pgclient.end()
       return;
     }
@@ -132,4 +133,3 @@ app.listen(PORT,async function(){
   }
 
 })
-

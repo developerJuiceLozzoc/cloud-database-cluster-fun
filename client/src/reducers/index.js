@@ -10,10 +10,10 @@ import {
 
 export const mirrors = ["10.0.0.245","10.0.0.116","10.0.0.92","10.0.0.237","10.0.0.223"]
 
-
 export const initialState = {
   history: {
-    pi: []
+    pi: [],
+    names: [], // array of pi identities and their contents
 
   },
   search: {

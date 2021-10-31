@@ -19,15 +19,15 @@ services:
     - POSTGRES_PASSWORD=password  # The PostgreSQL password (useful to connect to the database)
   volumes:
    - mysql-data:/var/lib/postgresql/data
- movie-streaming-app:
+ movie-search-app:
    depends_on:
     - mysql
    build: .
    restart: always
    env_file: ../.env
    ports:
-    - 4444:4444
+    - 80:80
    volumes:
-    - /media/:/run/media/pi/My Passport1/videos
+     - ../client/build:/react/build
 volumes:
  mysql-data:
