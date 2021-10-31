@@ -1,3 +1,4 @@
+require('.dotenv').config({ path: '../.env' })
 const fs = require('fs');
 const express = require("express")
 const app = express()
@@ -55,6 +56,7 @@ app.post('/api/pies/ping', async function(req,res){
       const expressinstance = new NodejsServerIdentity(req.body)
       console.log(expressinstance);
       let query = createPiIdentityRecord(expressinstance);
+      if
       let tempresponse2 = await pgclient.query(query.text,query.values);
       await pgclient.end()
       return;
@@ -62,7 +64,6 @@ app.post('/api/pies/ping', async function(req,res){
     await pgclient.end()
   } catch (e) {
     console.log(e);
-    res.status(500).end()
     await pgclient.end()
   }
 })
