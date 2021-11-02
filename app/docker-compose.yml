@@ -28,6 +28,6 @@ services:
    ports:
     - 4444:4444
    volumes:
-    - /media/:/run/media/pi/My Passport1/videos
+    - /home/pi/Desktop/media:/moviez
 volumes:
  mysql-data:

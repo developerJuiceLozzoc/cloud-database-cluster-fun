@@ -1,4 +1,4 @@
-require('.dotenv').config({ path: '../.env' })
+require('dotenv').config({ path: '../.env' })
 const fs = require('fs');
 const express = require("express")
 const app = express()
@@ -15,6 +15,7 @@ const {
   readStatsOfAllPis
 } = require("./model/model.js")
 const {
+NodejsServerIdentity,
   createPiStatsTable,
   createPiIdentityTable,
   createWatchHistoryTable,
@@ -55,8 +56,10 @@ app.post('/api/pies/ping', async function(req,res){
     if(tempresponse1.rows.length === 0) {
       const expressinstance = new NodejsServerIdentity(req.body)
       console.log(expressinstance);
+	if(expressinstance.invalid){
+		throw "big dumb data trying to create submask id"
+	}
       let query = createPiIdentityRecord(expressinstance);
-      if
       let tempresponse2 = await pgclient.query(query.text,query.values);
       await pgclient.end()
       return;

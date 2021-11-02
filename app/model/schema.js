@@ -100,7 +100,7 @@ function createTVTagsRelationshipsTable() {
      const {submask, cpus, hostname, release, version, ostype, arch} = data;
      this.submask = submask
      this.cpus = cpus;
-     this.hostname = hostnmae;
+     this.hostname = hostname;
      this.release = release;
      this.version = version;
      this.ostype = ostype;

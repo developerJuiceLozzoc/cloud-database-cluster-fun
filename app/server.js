@@ -182,7 +182,7 @@ app.listen(PORT,async function(){
   }
   catch(e){
     console.log(e);
-      await pgclient.end()
+    //  await pgclient.end()
   }
 
 })
