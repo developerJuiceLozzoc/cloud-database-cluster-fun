@@ -17,7 +17,7 @@ function PlainHtml5Viewr(props){
   //.replace("/home/pi/Videos/","/home/pi/Desktop/My Passport/videos/")
   let query =  !!props.selectedvideo ? queryString.stringify({
     size: props.selectedvideo.movie_size,
-    path: props.selectedvideo.filename.replace("/home/pi/Videos/","/media/"),
+    path: props.selectedvideo.filename.replace("/home/pi/Videos/","/moviez/"),
   }) : null;
 
   if(!!props.selectedvideo){
