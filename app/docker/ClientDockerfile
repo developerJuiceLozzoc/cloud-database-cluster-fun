@@ -1,0 +1,11 @@
+FROM node:latest
+WORKDIR /home/app
+
+COPY ./package.json /home/app/
+COPY ./package-lock.json /home/app/
+
+RUN npm ci
+
+COPY . /home/app
+
+CMD node server.js

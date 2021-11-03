@@ -12,22 +12,12 @@ services:
     # you are connecting to your database.
   ports:
     - 5432:5432
-  env_file: ../.env
+  env_file: ../../.env
   restart: always
   environment:
     - POSTGRES_USER=root  # The PostgreSQL user (useful to connect to the database)
     - POSTGRES_PASSWORD=password  # The PostgreSQL password (useful to connect to the database)
   volumes:
    - mysql-data:/var/lib/postgresql/data
- movie-search-app:
-   depends_on:
-    - mysql
-   build: .
-   restart: always
-   env_file: ../.env
-   ports:
-    - 80:80
-   volumes:
-     - ../client/build:/react/build
 volumes:
  mysql-data:

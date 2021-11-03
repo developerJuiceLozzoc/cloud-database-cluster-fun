@@ -1,3 +1,4 @@
+require("dotenv").config({path: "../.env"});
 const PORT = process.env.PROXY_PORT || 4000;
 const ARCHAEIC_URL = process.env.COLLECTION_URL;
 const COLLECTION_PORT = process.env.COLLECTION_PORT;
@@ -10,10 +11,6 @@ const axios = require('axios')
 
 const app = express()
 
-const {createReadstreamForPath,
-  sshConnect,
-  sshDisconnect
-} = require("./helpers/sshHelpers")
 
 const { createMoviesTable,
     createTagsTable,
@@ -152,14 +149,14 @@ app.listen(PORT,async function(){
     await pgclient.connect()
 
     /* insert */
-    // await pgclient.query(createTagsTable())
-    // await pgclient.query(createMoviesTable())
-    // await pgclient.query(createTvShowTable())
-    // await pgclient.query(createMovieTagsRelationshipsTable())
-    // await pgclient.query(createTVTagsRelationshipsTable())
-    // await pgclient.query(createBulkTags())
-    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
-    // useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
+     //await pgclient.query(createTagsTable())
+     //await pgclient.query(createMoviesTable())
+     //await pgclient.query(createTvShowTable())
+     //await pgclient.query(createMovieTagsRelationshipsTable())
+     //await pgclient.query(createTVTagsRelationshipsTable())
+     //await pgclient.query(createBulkTags())
+     //useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/tvshow.csv')
+     //useClientToBulkInsert(pgclient,'../meaty/tvshowdump/pi/movies.csv')
     /* end insert */
 
     /* read count */

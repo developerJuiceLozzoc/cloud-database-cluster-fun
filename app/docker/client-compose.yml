@@ -12,22 +12,24 @@ services:
     # you are connecting to your database.
   ports:
     - 5432:5432
-  env_file: ../.env
+  env_file: ../../.env
   restart: always
   environment:
     - POSTGRES_USER=root  # The PostgreSQL user (useful to connect to the database)
     - POSTGRES_PASSWORD=password  # The PostgreSQL password (useful to connect to the database)
   volumes:
    - mysql-data:/var/lib/postgresql/data
- movie-streaming-app:
+ movie-search-app:
    depends_on:
     - mysql
-   build: .
+   build: 
+    context: ../
+    dockerfile: ./docker/ClientDockerfile
    restart: always
-   env_file: ../.env
+   env_file: ../../.env
    ports:
-    - 4444:4444
+    - 80:80
    volumes:
-    - /home/pi/Desktop/media:/moviez
+     - ../../client/build:/react/build
 volumes:
  mysql-data:
